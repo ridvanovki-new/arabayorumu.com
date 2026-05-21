@@ -1,7 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="tr">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>arabayorumu.com — Türkiye'nin Araba Değerlendirme Sitesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 const supabaseUrl = 'https://uyguuzgwdebbjkzcgklp.supabase.co'
@@ -10,12 +16,6 @@ const supabaseKey = 'sb_publishable_W4DEbRW38ho8vrQOhUMsiA_7QO2Ww59'
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 </script>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>arabayorumu.com — Türkiye'nin Araba Değerlendirme Sitesi</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
- 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -42,6 +42,11 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 
 --sidebar:#374151;
 --sidebar2:#4b5563;
+--bg4:#dde5ee;
+--bg5:#cbd5e1;
+--border3:rgba(15,23,42,.22);
+--r:8px;
+--r2:10px;
 }
 html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#eef2f6;color:var(--text);font-size:14px}
 
@@ -293,6 +298,252 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* === OKUNAKLILIK VE AÇIK TEMA DÜZELTMESİ === */
+html,
+body {
+  background:#eef2f6 !important;
+  color:#020617 !important;
+}
+
+/* Orta alan */
+.center,
+.center-scroll {
+  background:#eef2f6 !important;
+  color:#020617 !important;
+}
+
+.car-header {
+  background:#eef2f6 !important;
+  border-bottom:1px solid #cbd5e1 !important;
+  color:#020617 !important;
+}
+
+/* Sol menü: açık ama premium gri */
+.sidebar {
+  background:linear-gradient(180deg,#d9e1ea 0%,#e8edf3 100%) !important;
+  border-right:1px solid #cbd5e1 !important;
+}
+
+.brand-row .bname {
+  color:#020617 !important;
+  font-weight:800 !important;
+}
+
+.brand-row .bcnt,
+.brand-row .chev {
+  color:#334155 !important;
+  font-weight:700 !important;
+}
+
+.brand-row:hover,
+.brand-row.open {
+  background:#cbd5e1 !important;
+}
+
+.model-list {
+  background:#dde5ee !important;
+}
+
+.model-row {
+  color:#0f172a !important;
+  font-weight:700 !important;
+}
+
+.model-row span {
+  color:#334155 !important;
+  font-weight:700 !important;
+}
+
+.model-row:hover,
+.model-row.active {
+  background:#cbd5e1 !important;
+  color:#020617 !important;
+}
+
+.sb-head {
+  color:#334155 !important;
+  font-weight:900 !important;
+}
+
+/* Orta üst araç bilgileri */
+.car-h-name {
+  color:#020617 !important;
+  font-weight:900 !important;
+}
+
+.car-h-sub {
+  color:#111827 !important;
+  font-weight:700 !important;
+}
+
+.rating-row,
+.avg-n,
+.rv-c {
+  color:#111827 !important;
+  font-weight:800 !important;
+}
+
+/* Bölüm başlıkları */
+.section-lbl {
+  color:#111827 !important;
+  font-weight:900 !important;
+  letter-spacing:2px !important;
+}
+
+.section-lbl::after {
+  background:#cbd5e1 !important;
+}
+
+/* Henüz yorum yok satırı */
+.center-scroll div[style*="Henüz onaylı yorum yok"] {
+  color:#111827 !important;
+  font-weight:700 !important;
+}
+
+/* Yorum yazma kutusu */
+.login-required {
+  background:#f8fafc !important;
+  border:1px solid #cbd5e1 !important;
+  color:#111827 !important;
+  font-weight:700 !important;
+}
+
+.login-required button {
+  font-weight:900 !important;
+}
+
+/* Rozetler */
+.badge {
+  background:#e5e7eb !important;
+  border:1px solid #cbd5e1 !important;
+  color:#111827 !important;
+  font-weight:800 !important;
+}
+
+.badge.fuel {
+  background:#dbeafe !important;
+  border-color:#bfdbfe !important;
+  color:#1d4ed8 !important;
+  font-weight:900 !important;
+}
+
+.badge.price {
+  background:#fee2e2 !important;
+  border-color:#fecaca !important;
+  color:#dc2626 !important;
+  font-weight:900 !important;
+}
+
+/* Sağ panel yazıları */
+.spec-group-title {
+  color:#334155 !important;
+  font-weight:900 !important;
+}
+
+.spec-lbl {
+  color:#475569 !important;
+  font-weight:800 !important;
+}
+
+.spec-val {
+  color:#020617 !important;
+  font-weight:800 !important;
+}
+
+.spec-box,
+.pc-box {
+  background:#eef2f7 !important;
+}
+
+/* Boş ekran ve hero */
+.hero-title,
+.empty-title {
+  color:#020617 !important;
+  font-weight:900 !important;
+}
+
+.hero-sub,
+.empty-sub {
+  color:#1f2937 !important;
+  font-weight:600 !important;
+}
+
+.hero-stat-lbl {
+  color:#334155 !important;
+  font-weight:800 !important;
+}
+
+.hero-stat-num {
+  color:#dc2626 !important;
+  font-weight:900 !important;
+}
+
+/* Genel kart ve review yazıları */
+.review-card,
+.add-form {
+  background:#ffffff !important;
+  border:1px solid #d1d5db !important;
+  box-shadow:0 10px 30px rgba(15,23,42,.06) !important;
+}
+
+.rv-name {
+  color:#020617 !important;
+  font-weight:800 !important;
+}
+
+.rv-date,
+.rv-body {
+  color:#111827 !important;
+  font-weight:600 !important;
+}
+
+/* Topbar */
+.topbar {
+  background:#e5e7eb !important;
+  border-bottom:1px solid #cbd5e1 !important;
+}
+
+.tb-btn,
+.compare-pill {
+  color:#111827 !important;
+  font-weight:700 !important;
+}
+
+.search-wrap input {
+  background:#f8fafc !important;
+  color:#020617 !important;
+  border:1px solid #cbd5e1 !important;
+}
+
+.search-wrap input::placeholder {
+  color:#475569 !important;
+}
+
+/* Sağ panel */
+.right,
+.right-scroll {
+  background:#f8fafc !important;
+}
+
+.filter-area {
+  background:#f8fafc !important;
+  border-bottom:1px solid #d1d5db !important;
+}
+
+.fchip {
+  background:#ffffff !important;
+  color:#334155 !important;
+  border:1px solid #cbd5e1 !important;
+  font-weight:700 !important;
+}
+
+.fchip.on {
+  background:#ef4444 !important;
+  border-color:#ef4444 !important;
+  color:#ffffff !important;
+}
+
 </style>
 </head>
 <body>
@@ -1040,5 +1291,3 @@ renderTopbar();
 </script>
 </body>
 </html>
-HTMLEOF
-echo "Done: $(wc -c < /mnt/user-data/outputs/arabayorumu.html) bytes"
