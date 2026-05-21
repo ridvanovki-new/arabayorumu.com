@@ -15,6 +15,203 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>arabayorumu.com — Türkiye'nin Araba Değerlendirme Sitesi</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  /* === LIGHT PREMIUM THEME OVERRIDE === */
+
+/* Genel arka plan */
+html,
+body {
+  background: #f1f5f9 !important;
+  color: #1f2937 !important;
+}
+
+/* Üst bar */
+.topbar {
+  background: #e5e7eb !important;
+  border-bottom: 1px solid #d1d5db !important;
+}
+
+/* Sol menü: tam koyu değil, soft gri */
+.sidebar {
+  background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%) !important;
+  border-right: 1px solid #cbd5e1 !important;
+}
+
+/* Sol menü başlığı */
+.sb-head {
+  color: #64748b !important;
+}
+
+/* Marka yazıları */
+.brand-row .bname {
+  color: #111827 !important;
+}
+
+/* Marka sayı ve okları */
+.brand-row .bcnt,
+.brand-row .chev {
+  color: #64748b !important;
+}
+
+/* Sol menü hover */
+.brand-row:hover {
+  background: #dbe4ef !important;
+}
+
+/* Açık marka */
+.brand-row.open {
+  background: #dbe4ef !important;
+  border-left-color: #ef4444 !important;
+}
+
+/* Model listesi */
+.model-list {
+  background: #edf2f7 !important;
+}
+
+/* Model satırları */
+.model-row {
+  color: #475569 !important;
+}
+
+/* Model hover */
+.model-row:hover {
+  background: #dbe4ef !important;
+  color: #111827 !important;
+}
+
+/* Aktif model */
+.model-row.active {
+  background: #cbd5e1 !important;
+  color: #111827 !important;
+  border-left-color: #ef4444 !important;
+}
+
+/* Orta ana alan */
+.center {
+  background: #f1f5f9 !important;
+  border-right: 1px solid #d1d5db !important;
+}
+
+/* Orta scroll alan */
+.center-scroll {
+  background: #f1f5f9 !important;
+}
+
+/* Hero alanı */
+.hero-banner {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border-bottom: 1px solid #d1d5db !important;
+}
+
+/* Hero başlık */
+.hero-title {
+  color: #111827 !important;
+}
+
+.hero-sub {
+  color: #64748b !important;
+}
+
+/* Boş durum yazıları */
+.empty-title {
+  color: #1f2937 !important;
+}
+
+.empty-sub {
+  color: #64748b !important;
+}
+
+/* Sağ panel */
+.right {
+  background: #f8fafc !important;
+  border-left: 1px solid #d1d5db !important;
+}
+
+/* Sağ panel scroll */
+.right-scroll {
+  background: #f8fafc !important;
+}
+
+/* Filtre alanı */
+.filter-area {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Filtre butonları */
+.fchip {
+  background: #ffffff !important;
+  color: #64748b !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.fchip.on {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* Kartlar */
+.review-card,
+.add-form,
+.spec-box,
+.pc-box,
+.login-required {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Kart içi yazılar */
+.rv-body,
+.spec-lbl,
+.score-top,
+.pc-item {
+  color: #64748b !important;
+}
+
+.spec-val,
+.rv-name,
+.car-h-name,
+.car-h-sub {
+  color: #111827 !important;
+}
+
+/* Araç header */
+.car-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #d1d5db !important;
+}
+
+/* Fotoğraf alanı */
+.photo-strip {
+  background: #eef2f7 !important;
+}
+
+/* Inputlar */
+.search-wrap input,
+.fg input,
+.fg select,
+.fg textarea,
+.ml-input-wrap input {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #111827 !important;
+}
+
+/* Üst sağ butonlar */
+.tb-btn,
+.compare-pill {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #475569 !important;
+}
+
+.tb-btn.accent {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
