@@ -1,0 +1,994 @@
+bash
+
+cat > /mnt/user-data/outputs/arabayorumu.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>arabayorumu.com — Türkiye'nin Araba Değerlendirme Sitesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0f;--bg2:#131318;--bg3:#1a1a22;--bg4:#222230;--bg5:#2a2a38;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--border3:rgba(255,255,255,0.22);
+  --text:#e8e8f0;--text2:#8888a0;--text3:#44445a;
+  --accent:#e03040;--accent2:#ff4455;
+  --gold:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  --r:8px;--r2:12px
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;position:relative;z-index:50}
+.logo{font-size:15px;font-weight:700;letter-spacing:-0.5px;white-space:nowrap;cursor:pointer}
+.logo span{color:var(--accent)}
+.search-wrap{flex:1;max-width:300px;position:relative}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px 7px 30px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif}
+.search-wrap input:focus{outline:none;border-color:var(--border2)}
+.search-wrap .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-btn{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:6px 12px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.15s}
+.tb-btn:hover{border-color:var(--border3);color:var(--text)}
+.tb-btn.accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.tb-btn.accent:hover{background:var(--accent2)}
+.tb-btn.admin{background:rgba(224,48,64,0.12);border-color:var(--accent);color:var(--accent2)}
+.user-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px 4px 4px;cursor:pointer;transition:all 0.15s}
+.user-chip:hover{border-color:var(--border3)}
+.user-av{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:500;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.compare-pill{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 12px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all 0.15s}
+.compare-pill:hover{border-color:var(--border3);color:var(--text)}
+.cnt-badge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 52px);overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:196px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+.sb-head{padding:10px 12px 5px;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+.brand-row{padding:7px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-left:2px solid transparent;transition:all 0.12s;user-select:none}
+.brand-row:hover{background:var(--bg3)}
+.brand-row.open{background:var(--bg3);border-left-color:var(--accent)}
+.brand-row .bname{font-size:12px;font-weight:500;color:var(--text)}
+.brand-row .bmeta{display:flex;align-items:center;gap:4px}
+.brand-row .bcnt{font-size:10px;color:var(--text3)}
+.brand-row .chev{font-size:9px;color:var(--text3);transition:transform 0.18s}
+.brand-row.open .chev{transform:rotate(90deg)}
+.model-list{display:none;background:var(--bg3)}
+.brand-row.open+.model-list{display:block}
+.model-row{padding:6px 12px 6px 18px;cursor:pointer;font-size:12px;color:var(--text2);border-left:2px solid transparent;transition:all 0.12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.model-row:hover{color:var(--text);background:var(--bg4)}
+.model-row.active{color:var(--text);border-left-color:var(--accent);background:var(--bg4)}
+
+/* CENTER */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
+
+/* HERO BANNER */
+.hero-banner{padding:18px 20px 14px;background:linear-gradient(180deg,rgba(224,48,64,0.06) 0%,transparent 100%);border-bottom:1px solid var(--border);flex-shrink:0;text-align:center}
+.hero-title{font-size:20px;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5}
+.hero-stats{display:flex;justify-content:center;gap:20px;margin-top:10px}
+.hero-stat{text-align:center}
+.hero-stat-num{font-size:16px;font-weight:700;color:var(--accent2)}
+.hero-stat-lbl{font-size:10px;color:var(--text3)}
+
+/* CAR HEADER (shows when car selected) */
+.car-header{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;display:none}
+.car-header.visible{display:block}
+.car-h-top{display:flex;align-items:flex-start;gap:8px}
+.car-h-name{font-size:16px;font-weight:700}
+.car-h-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.car-h-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
+.badge.fuel{background:rgba(59,130,246,0.1);color:#60a5fa;border-color:rgba(59,130,246,0.18)}
+.badge.price{background:rgba(224,48,64,0.1);color:#f87171;border-color:rgba(224,48,64,0.18)}
+.rating-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.stars{color:var(--gold);letter-spacing:1px}
+.avg-n{font-size:14px;font-weight:700}
+.rv-c{font-size:12px;color:var(--text3)}
+.add-cmp{background:transparent;border:1px solid var(--border2);border-radius:5px;padding:4px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;margin-left:auto}
+.add-cmp:hover{border-color:var(--accent);color:var(--accent)}
+.add-cmp.added{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* SCROLL AREA */
+.center-scroll{flex:1;overflow-y:auto;padding:16px}
+.center-scroll::-webkit-scrollbar{width:3px}
+.center-scroll::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* EMPTY */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--text3)}
+.empty-icon{font-size:44px}
+.empty-title{font-size:14px;font-weight:500;color:var(--text2)}
+.empty-sub{font-size:12px;text-align:center;max-width:220px;line-height:1.6}
+
+/* REVIEWS */
+.section-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.section-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+.review-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px}
+.rv-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.av{width:32px;height:32px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0}
+.rv-name{font-size:12px;font-weight:600}
+.rv-date{font-size:10px;color:var(--text3);margin-top:1px}
+.rv-stars{margin-left:auto;color:var(--gold);font-size:11px;letter-spacing:1px}
+.rv-del{background:rgba(224,48,64,0.1);border:1px solid rgba(224,48,64,0.2);border-radius:4px;padding:2px 7px;color:#e03040;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;margin-left:4px}
+.rv-body{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* FORM */
+.add-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:8px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.fg label{display:block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--border2)}
+.fg textarea{resize:vertical;min-height:68px;grid-column:1/-1}
+.submit-btn{width:100%;background:var(--accent);border:none;border-radius:6px;padding:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.submit-btn:hover{background:var(--accent2)}
+.login-required{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:14px;text-align:center;color:var(--text2);font-size:12px}
+.login-required button{background:var(--accent);border:none;border-radius:6px;padding:6px 16px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px}
+
+/* RIGHT PANEL */
+.right{width:310px;flex-shrink:0;background:var(--bg2);display:flex;flex-direction:column;overflow:hidden}
+.right-scroll{flex:1;overflow-y:auto}
+.right-scroll::-webkit-scrollbar{width:3px}
+.right-scroll::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+.photo-strip{position:relative;background:var(--bg3);height:170px;overflow:hidden;flex-shrink:0}
+.ph-img{width:100%;height:100%;object-fit:cover;display:none}
+.ph-img.active{display:block}
+.photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text3)}
+.photo-dots{position:absolute;bottom:7px;left:0;right:0;display:flex;justify-content:center;gap:4px}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);cursor:pointer;transition:background 0.15s}
+.dot.active{background:#fff}
+.pnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.pnav.l{left:7px}.pnav.r{right:7px}
+.filter-area{padding:9px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.filter-chips{display:flex;gap:4px;flex-wrap:wrap}
+.fchip{font-size:11px;padding:3px 9px;border-radius:10px;border:1px solid var(--border);color:var(--text3);cursor:pointer;background:transparent;font-family:'Inter',sans-serif;transition:all 0.12s}
+.fchip:hover{border-color:var(--border2);color:var(--text)}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.specs-section{padding:10px 12px}
+.spec-group-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin:10px 0 6px;padding-top:10px;border-top:1px solid var(--border)}
+.spec-group-title:first-child{margin-top:0;padding-top:0;border-top:none}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.spec-box{background:var(--bg3);border-radius:6px;padding:8px 9px}
+.spec-box.wide{grid-column:1/-1}
+.spec-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.spec-val{font-size:12px;font-weight:600;color:var(--text);margin-top:2px}
+.score-row{margin-bottom:7px}
+.score-top{display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px;color:var(--text2)}
+.score-top span:last-child{font-weight:600;color:var(--text)}
+.bar-bg{height:4px;background:var(--bg5);border-radius:2px}
+.bar-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.pc-box{background:var(--bg3);border-radius:6px;padding:8px 9px}
+.pc-box.pros{border-top:2px solid var(--green)}
+.pc-box.cons{border-top:2px solid var(--accent)}
+.pc-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.pc-box.pros .pc-title{color:var(--green)}
+.pc-box.cons .pc-title{color:var(--accent)}
+.pc-item{font-size:10px;color:var(--text2);margin-bottom:3px;line-height:1.4;display:flex;gap:3px}
+.pc-box.pros .pc-item::before{content:"✓";color:var(--green);flex-shrink:0}
+.pc-box.cons .pc-item::before{content:"✗";color:var(--accent);flex-shrink:0}
+
+/* MODAL BASE */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.top{align-items:flex-start;padding:28px 16px;overflow-y:auto}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;padding:24px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 10px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;font-size:12px}
+.ml-input-wrap{margin-bottom:12px}
+.ml-input-wrap label{display:block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.ml-input-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+.ml-input-wrap input:focus{outline:none;border-color:var(--border2)}
+.ml-btn{width:100%;background:var(--accent);border:none;border-radius:7px;padding:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px}
+.ml-btn:hover{background:var(--accent2)}
+.ml-btn.secondary{background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
+.ml-btn.secondary:hover{border-color:var(--border3);color:var(--text)}
+.err-msg{color:#f87171;font-size:12px;margin-bottom:8px;display:none}
+.switch-link{font-size:12px;color:var(--text3);text-align:center;margin-top:12px}
+.switch-link span{color:var(--accent2);cursor:pointer}
+.switch-link span:hover{text-decoration:underline}
+
+/* COMPARE MODAL */
+.cmp-grid{display:grid;gap:10px}
+.cmp-car-hd{text-align:center;padding:12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:10px}
+.cmp-car-hd .clogo{font-size:30px;margin-bottom:4px}
+.cmp-car-hd h3{font-size:13px;font-weight:700}
+.cmp-car-hd p{font-size:11px;color:var(--text2)}
+.cmp-car-hd .cprice{font-size:12px;font-weight:700;color:var(--accent2);margin-top:3px}
+.cmp-row{display:grid;gap:8px;margin-bottom:4px}
+.cmp-rl{font-size:10px;color:var(--text3);text-align:center;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.cmp-cell{background:var(--bg3);border-radius:6px;padding:7px;text-align:center;font-size:11px;font-weight:500}
+.cmp-cell.best{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.22);color:var(--green)}
+
+/* PROFILE MODAL */
+.prof-stat{background:var(--bg3);border-radius:var(--r);padding:10px 12px;text-align:center}
+.prof-stat-n{font-size:20px;font-weight:700;color:var(--accent2)}
+.prof-stat-l{font-size:10px;color:var(--text3);margin-top:2px}
+.prof-rv{background:var(--bg3);border-radius:var(--r);padding:10px 12px;margin-bottom:6px}
+.prof-rv-car{font-size:12px;font-weight:600;color:var(--text)}
+.prof-rv-text{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+
+/* ADMIN PANEL */
+.adm-section{padding:14px;border-bottom:1px solid var(--border)}
+.adm-section-title{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.adm-badge{background:rgba(224,48,64,0.2);color:#f87171;border-radius:8px;padding:1px 6px;font-size:9px}
+.pending-card{background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:7px;border:1px solid var(--border)}
+.pnd-meta{font-size:11px;color:var(--text3);margin-bottom:5px}
+.pnd-text{font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5}
+.pnd-actions{display:flex;gap:6px}
+.pnd-approve{flex:1;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);border-radius:5px;padding:5px;color:#22c55e;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.pnd-reject{flex:1;background:rgba(224,48,64,0.08);border:1px solid rgba(224,48,64,0.18);border-radius:5px;padding:5px;color:#e03040;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.car-adm-row{display:flex;align-items:center;gap:7px;padding:7px;background:var(--bg3);border-radius:6px;margin-bottom:5px;border:1px solid var(--border)}
+.car-adm-info{flex:1;min-width:0}
+.car-adm-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.car-adm-sub{font-size:10px;color:var(--text3)}
+.adm-input{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;width:100%;margin-bottom:5px}
+.adm-input:focus{outline:none;border-color:var(--border2)}
+.adm-select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;width:100%;margin-bottom:5px}
+.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.adm-btn{background:var(--accent);border:none;border-radius:5px;padding:7px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.adm-btn:hover{background:var(--accent2)}
+.adm-btn.del{background:rgba(224,48,64,0.1);border:1px solid rgba(224,48,64,0.2);color:#e03040}
+.adm-btn.del:hover{background:rgba(224,48,64,0.2)}
+.adm-btn.blue{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.25);color:#60a5fa}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:all 0.25s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="root">
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo" onclick="showHome()">arabayorumu<span>.com</span></div>
+  <div class="search-wrap">
+    <span class="si">🔍</span>
+    <input type="text" id="searchInput" placeholder="Marka veya model ara..." oninput="handleSearch()">
+  </div>
+  <div class="tb-right" id="tbRight"></div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="hero-banner" id="heroBanner">
+      <div class="hero-title">Türkiye'nin Araba <span>Değerlendirme</span> Sitesi</div>
+      <div class="hero-sub">Gerçek sürücülerden gerçek deneyimler · Detaylı teknik karşılaştırma · Onaylı kullanıcı yorumları</div>
+      <div class="hero-stats" id="heroStats"></div>
+    </div>
+    <div class="car-header" id="carHeader"></div>
+    <div class="center-scroll" id="centerScroll">
+      <div class="empty-state">
+        <div class="empty-icon">🚗</div>
+        <div class="empty-title">Bir araç seçin</div>
+        <div class="empty-sub">Sol menüden markaya tıklayıp model seçerek yorumları görün.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="photo-strip" id="photoStrip">
+      <div class="photo-placeholder"><div style="font-size:44px">🚘</div><span style="font-size:11px;color:var(--text3)">Araç seçilmedi</span></div>
+    </div>
+    <div class="filter-area"><div class="filter-chips" id="filterChips"></div></div>
+    <div class="right-scroll" id="rightScroll">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);font-size:12px;text-align:center;padding:16px">Bir araç seçerek<br>detayları görün</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== DATA =====================
+const BRANDS = [
+  {id:"toyota",name:"Toyota"},{id:"honda",name:"Honda"},{id:"nissan",name:"Nissan"},
+  {id:"mazda",name:"Mazda"},{id:"mitsubishi",name:"Mitsubishi"},{id:"subaru",name:"Subaru"},
+  {id:"suzuki",name:"Suzuki"},{id:"volkswagen",name:"Volkswagen"},{id:"bmw",name:"BMW"},
+  {id:"mercedes",name:"Mercedes-Benz"},{id:"audi",name:"Audi"},{id:"opel",name:"Opel"},
+  {id:"porsche",name:"Porsche"},{id:"renault",name:"Renault"},{id:"peugeot",name:"Peugeot"},
+  {id:"citroen",name:"Citroën"},{id:"ds",name:"DS Automobiles"},{id:"ford",name:"Ford"},
+  {id:"jeep",name:"Jeep"},{id:"fiat",name:"Fiat"},{id:"alfa",name:"Alfa Romeo"},
+  {id:"hyundai",name:"Hyundai"},{id:"kia",name:"Kia"},{id:"genesis",name:"Genesis"},
+  {id:"skoda",name:"Škoda"},{id:"seat",name:"SEAT / Cupra"},{id:"volvo",name:"Volvo"},
+  {id:"land_rover",name:"Land Rover"},{id:"mini",name:"MINI"},{id:"jaguar",name:"Jaguar"},
+  {id:"tesla",name:"Tesla"},{id:"byd",name:"BYD"},{id:"chery",name:"Chery/Omoda"},
+  {id:"mg",name:"MG"},{id:"togg",name:"Togg 🇹🇷"},
+];
+const BRAND_LOGO = {toyota:"🔴",honda:"🔵",nissan:"⚙️",mazda:"🔷",mitsubishi:"💎",subaru:"⭐",suzuki:"🟦",volkswagen:"🔵",bmw:"🔵",mercedes:"⭐",audi:"🔵",opel:"⚡",porsche:"🐎",renault:"🔷",peugeot:"🦁",citroen:"🔶",ds:"🌟",ford:"🔵",jeep:"🟩",fiat:"🔵",alfa:"🔴",hyundai:"🔷",kia:"🔵",genesis:"🌟",skoda:"🔵",seat:"🔵",volvo:"🔵",land_rover:"🟩",mini:"🔵",jaguar:"🐆",tesla:"⚡",byd:"🔷",chery:"🔴",mg:"🔴",togg:"🇹🇷"};
+const sc=(k,v)=>scoreColor(v);
+function scoreColor(v){return v>=80?"#22c55e":v>=60?"#f59e0b":"#e03040"}
+
+const CARS = [
+  {id:1,brand:"toyota",model:"Corolla",variant:"1.8 Hybrid",year:"2019-2024",fuel:"Benzin/Hibrit",power:"122 bg",torque:"142 Nm",engine:"1.8L 4sil e-CVT",transmission:"e-CVT Otomatik",consumption:"4.3 L/100km",co2:"97 g/km",weight:"1370 kg",dims:"4630×1780×1435 mm",wb:"2700 mm",trunk:"217 L",seats:5,drive:"Önden Çekiş",price:"1.150.000–1.750.000 ₺",cat:"Sedan",tags:["Hibrit","Ekonomik"],pros:["Çok düşük yakıt tüketimi","Uzun vadeli güvenilirlik","Yaygın servis"],cons:["Hibrit aküsü masraflı","Sürüş keyfi sınırlı","Bagaj küçük"],scores:{guvenilirlik:95,konfor:72,surusKeyfi:60,ekonomi:95,teknoloji:72},reviews:[{name:"Murat K.",userId:null,date:"Mart 2024",stars:5,text:"3 yıldır kullanıyorum, tek sorun çıkmadı. Şehirde 4.8L civarında tüketiyor."},{name:"Ayşe D.",userId:null,date:"Ocak 2024",stars:4,text:"Konfor orta ama güvenilirlik gerçekten iyi. Servis ağı çok yaygın."}]},
+  {id:2,brand:"toyota",model:"Yaris",variant:"1.5 Hybrid",year:"2020-2024",fuel:"Benzin/Hibrit",power:"116 bg",torque:"141 Nm",engine:"1.5L 3sil e-CVT",transmission:"e-CVT Otomatik",consumption:"3.8 L/100km",co2:"87 g/km",weight:"1265 kg",dims:"3940×1745×1500 mm",wb:"2560 mm",trunk:"286 L",seats:5,drive:"Önden Çekiş",price:"850.000–1.200.000 ₺",cat:"Hatchback",tags:["Şehir","Ekonomik"],pros:["Çok ekonomik","Kolay park"],cons:["Küçük iç mekan","Otoban zayıf"],scores:{guvenilirlik:92,konfor:65,surusKeyfi:62,ekonomi:98,teknoloji:68},reviews:[{name:"Emre S.",userId:null,date:"Şubat 2024",stars:4,text:"Şehir içi için mükemmel. Yakıt gerçekten düşük."}]},
+  {id:3,brand:"toyota",model:"RAV4",variant:"2.5 Hybrid AWD",year:"2019-2024",fuel:"Benzin/Hibrit",power:"222 bg",torque:"163 Nm",engine:"2.5L 4sil",transmission:"e-CVT Otomatik",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1820 kg",dims:"4600×1855×1685 mm",wb:"2690 mm",trunk:"580 L",seats:5,drive:"4×4 Hibrit AWD",price:"2.500.000–3.500.000 ₺",cat:"SUV",tags:["4x4","Hibrit"],pros:["AWD performans","Geniş bagaj"],cons:["Yüksek fiyat"],scores:{guvenilirlik:91,konfor:82,surusKeyfi:68,ekonomi:78,teknoloji:80},reviews:[]},
+  {id:4,brand:"toyota",model:"C-HR",variant:"2.0 Hybrid",year:"2020-2024",fuel:"Benzin/Hibrit",power:"184 bg",torque:"190 Nm",engine:"2.0L 4sil",transmission:"e-CVT Otomatik",consumption:"5.0 L/100km",co2:"114 g/km",weight:"1545 kg",dims:"4360×1795×1565 mm",wb:"2640 mm",trunk:"358 L",seats:5,drive:"Önden Çekiş",price:"1.800.000–2.400.000 ₺",cat:"SUV",tags:["Hibrit","Kompakt SUV"],pros:["Çarpıcı tasarım","İyi hibrit tüketimi"],cons:["Görüş kısıtlı","Arka dar"],scores:{guvenilirlik:88,konfor:74,surusKeyfi:70,ekonomi:85,teknoloji:78},reviews:[]},
+  {id:5,brand:"toyota",model:"Camry",variant:"2.5 Hybrid",year:"2019-2024",fuel:"Benzin/Hibrit",power:"218 bg",torque:"221 Nm",engine:"2.5L 4sil",transmission:"e-CVT Otomatik",consumption:"5.1 L/100km",co2:"117 g/km",weight:"1615 kg",dims:"4885×1840×1445 mm",wb:"2825 mm",trunk:"524 L",seats:5,drive:"Önden Çekiş",price:"2.800.000–3.500.000 ₺",cat:"Sedan",tags:["Lüks","Hibrit"],pros:["Geniş lüks iç mekan"],cons:["Yüksek fiyat","Spor yok"],scores:{guvenilirlik:93,konfor:88,surusKeyfi:65,ekonomi:80,teknoloji:82},reviews:[]},
+  {id:10,brand:"volkswagen",model:"Golf",variant:"1.5 TSI 150bg",year:"2020-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TSI 4sil",transmission:"7-DSG Otomatik",consumption:"5.5 L/100km",co2:"126 g/km",weight:"1340 kg",dims:"4284×1789×1456 mm",wb:"2636 mm",trunk:"381 L",seats:5,drive:"Önden Çekiş",price:"1.500.000–2.200.000 ₺",cat:"Hatchback",tags:["Premium","Sürüş keyfi"],pros:["Mükemmel dinamik","Kaliteli iç mekan","DSG"],cons:["Pahalı servis","DSG sorunları"],scores:{guvenilirlik:78,konfor:80,surusKeyfi:88,ekonomi:74,teknoloji:82},reviews:[{name:"Can B.",userId:null,date:"Aralık 2023",stars:5,text:"Sürüş dinamiği harika. DSG vites kutusu mükemmel."},{name:"Zeynep A.",userId:null,date:"Kasım 2023",stars:4,text:"İç mekan kalitesi segment üstü."}]},
+  {id:11,brand:"volkswagen",model:"Passat",variant:"2.0 TDI 150bg",year:"2019-2023",fuel:"Dizel",power:"150 bg",torque:"360 Nm",engine:"2.0L TDI 4sil",transmission:"7-DSG Otomatik",consumption:"5.2 L/100km",co2:"136 g/km",weight:"1530 kg",dims:"4767×1832×1456 mm",wb:"2786 mm",trunk:"650 L",seats:5,drive:"Önden Çekiş",price:"2.200.000–3.200.000 ₺",cat:"Sedan",tags:["Uzun yol","Business"],pros:["Konforlu","Geniş bagaj","Dizel ekonomi"],cons:["AdBlue gideri","DPF sorunları"],scores:{guvenilirlik:76,konfor:85,surusKeyfi:74,ekonomi:80,teknoloji:80},reviews:[{name:"Hasan T.",userId:null,date:"Ekim 2023",stars:5,text:"İş seyahatleri için ideal. Otoban yakıtı 4.5L'ye iniyor."}]},
+  {id:12,brand:"volkswagen",model:"Polo",variant:"1.0 TSI 95bg",year:"2018-2024",fuel:"Benzin",power:"95 bg",torque:"175 Nm",engine:"1.0L TSI 3sil",transmission:"DSG/Manuel",consumption:"4.8 L/100km",co2:"109 g/km",weight:"1212 kg",dims:"4053×1751×1461 mm",wb:"2564 mm",trunk:"351 L",seats:5,drive:"Önden Çekiş",price:"850.000–1.350.000 ₺",cat:"Hatchback",tags:["Şehir","Ekonomik"],pros:["Kaliteli iç mekan","Düşük tüketim"],cons:["3 silindir titreşim"],scores:{guvenilirlik:80,konfor:72,surusKeyfi:68,ekonomi:85,teknoloji:74},reviews:[]},
+  {id:13,brand:"volkswagen",model:"Tiguan",variant:"2.0 TSI 190bg 4Motion",year:"2020-2024",fuel:"Benzin",power:"190 bg",torque:"320 Nm",engine:"2.0L TSI 4sil",transmission:"7-DSG Otomatik",consumption:"7.2 L/100km",co2:"164 g/km",weight:"1682 kg",dims:"4487×1839×1673 mm",wb:"2681 mm",trunk:"615 L",seats:5,drive:"4×4 4Motion",price:"2.800.000–4.200.000 ₺",cat:"SUV",tags:["Aile SUV","4x4"],pros:["Güçlü 4Motion","Geniş iç mekan"],cons:["Yüksek tüketim","Pahalı bakım"],scores:{guvenilirlik:77,konfor:86,surusKeyfi:78,ekonomi:65,teknoloji:85},reviews:[]},
+  {id:14,brand:"volkswagen",model:"T-Roc",variant:"1.5 TSI 150bg",year:"2019-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TSI 4sil",transmission:"7-DSG Otomatik",consumption:"6.0 L/100km",co2:"138 g/km",weight:"1410 kg",dims:"4234×1819×1573 mm",wb:"2619 mm",trunk:"445 L",seats:5,drive:"Önden Çekiş",price:"1.700.000–2.400.000 ₺",cat:"SUV",tags:["Şık","Kompakt SUV"],pros:["Spor görünüm"],cons:["4WD sınırlı"],scores:{guvenilirlik:78,konfor:76,surusKeyfi:80,ekonomi:72,teknoloji:80},reviews:[]},
+  {id:20,brand:"bmw",model:"3 Serisi",variant:"320i 184bg",year:"2019-2024",fuel:"Benzin",power:"184 bg",torque:"290 Nm",engine:"2.0L B48 4sil",transmission:"8-Steptronic",consumption:"6.2 L/100km",co2:"142 g/km",weight:"1520 kg",dims:"4709×1827×1435 mm",wb:"2851 mm",trunk:"480 L",seats:5,drive:"Arkadan Çekiş",price:"3.000.000–5.500.000 ₺",cat:"Sedan",tags:["Spor","Prestij"],pros:["Üstün sürüş dinamiği","iDrive mükemmel"],cons:["Yüksek bakım","Yakıt tüketimi"],scores:{guvenilirlik:75,konfor:82,surusKeyfi:95,ekonomi:62,teknoloji:92},reviews:[{name:"Ahmet Y.",userId:null,date:"Mart 2024",stars:5,text:"Servis maliyeti yüksek ama sürüş deneyimi başka boyut."},{name:"Fatma Ö.",userId:null,date:"Şubat 2024",stars:3,text:"Muhteşem araç ama bakım çok ağır."}]},
+  {id:21,brand:"bmw",model:"5 Serisi",variant:"520i 184bg",year:"2021-2024",fuel:"Benzin",power:"184 bg",torque:"290 Nm",engine:"2.0L B48 4sil",transmission:"8-Steptronic",consumption:"6.5 L/100km",co2:"147 g/km",weight:"1670 kg",dims:"4963×1868×1470 mm",wb:"2995 mm",trunk:"520 L",seats:5,drive:"Arkadan Çekiş",price:"5.000.000–9.000.000 ₺",cat:"Sedan",tags:["Lüks","Business"],pros:["Lüks iç mekan","Driving Assistant"],cons:["Çok yüksek fiyat"],scores:{guvenilirlik:76,konfor:92,surusKeyfi:88,ekonomi:58,teknoloji:95},reviews:[{name:"Selim K.",userId:null,date:"Ocak 2024",stars:5,text:"Driving Assistance paketi mükemmel çalışıyor."}]},
+  {id:22,brand:"bmw",model:"X3",variant:"xDrive20i 184bg",year:"2018-2024",fuel:"Benzin",power:"184 bg",torque:"290 Nm",engine:"2.0L B48 4sil",transmission:"8-Steptronic",consumption:"7.2 L/100km",co2:"164 g/km",weight:"1765 kg",dims:"4716×1891×1676 mm",wb:"2864 mm",trunk:"550 L",seats:5,drive:"4×4 xDrive",price:"4.500.000–7.000.000 ₺",cat:"SUV",tags:["Lüks SUV","xDrive"],pros:["xDrive mükemmel","Premium his"],cons:["Çok yüksek fiyat"],scores:{guvenilirlik:76,konfor:88,surusKeyfi:85,ekonomi:58,teknoloji:92},reviews:[]},
+  {id:30,brand:"mercedes",model:"C Serisi",variant:"C 200 AMG 204bg",year:"2021-2024",fuel:"Benzin",power:"204 bg",torque:"300 Nm",engine:"2.0L M254 4sil",transmission:"9G-Tronic",consumption:"6.5 L/100km",co2:"148 g/km",weight:"1625 kg",dims:"4751×1820×1438 mm",wb:"2865 mm",trunk:"455 L",seats:5,drive:"Arkadan Çekiş",price:"3.500.000–6.500.000 ₺",cat:"Sedan",tags:["Lüks","MBUX"],pros:["MBUX sistemi eşsiz","İç mekan kalitesi en üst"],cons:["Yüksek bakım","Ek paket fiyatları"],scores:{guvenilirlik:78,konfor:95,surusKeyfi:82,ekonomi:60,teknoloji:98},reviews:[{name:"Derya M.",userId:null,date:"Nisan 2024",stars:5,text:"MBUX inanılmaz. İç mekan kalitesi rakipsiz."},{name:"Burak Ş.",userId:null,date:"Şubat 2024",stars:4,text:"Konfor mükemmel, servis ağı iyi."}]},
+  {id:31,brand:"mercedes",model:"A Serisi",variant:"A 180 136bg",year:"2018-2024",fuel:"Benzin",power:"136 bg",torque:"200 Nm",engine:"1.3L M282 4sil",transmission:"7G-DCT",consumption:"5.8 L/100km",co2:"133 g/km",weight:"1365 kg",dims:"4419×1796×1433 mm",wb:"2729 mm",trunk:"370 L",seats:5,drive:"Önden Çekiş",price:"1.800.000–2.800.000 ₺",cat:"Hatchback",tags:["Mercedes giriş","MBUX"],pros:["MBUX sistemi","Şık tasarım"],cons:["Motor Renault kökenli","Performans sınırlı"],scores:{guvenilirlik:74,konfor:80,surusKeyfi:68,ekonomi:72,teknoloji:90},reviews:[]},
+  {id:32,brand:"mercedes",model:"E Serisi",variant:"E 200 AMG 197bg",year:"2021-2024",fuel:"Benzin",power:"197 bg",torque:"320 Nm",engine:"2.0L M254 4sil",transmission:"9G-Tronic",consumption:"7.0 L/100km",co2:"159 g/km",weight:"1760 kg",dims:"4949×1852×1455 mm",wb:"2939 mm",trunk:"540 L",seats:5,drive:"Arkadan Çekiş",price:"5.500.000–10.000.000 ₺",cat:"Sedan",tags:["Lüks","Business"],pros:["Üst düzey konfor","Prestij"],cons:["Çok yüksek fiyat"],scores:{guvenilirlik:79,konfor:96,surusKeyfi:80,ekonomi:55,teknoloji:96},reviews:[]},
+  {id:33,brand:"mercedes",model:"GLC",variant:"GLC 220d AMG 197bg",year:"2022-2024",fuel:"Dizel",power:"197 bg",torque:"440 Nm",engine:"2.0L OM654 4sil",transmission:"9G-Tronic",consumption:"6.1 L/100km",co2:"161 g/km",weight:"1870 kg",dims:"4716×1890×1640 mm",wb:"2888 mm",trunk:"600 L",seats:5,drive:"4×4 4MATIC",price:"5.000.000–8.500.000 ₺",cat:"SUV",tags:["Lüks SUV","4MATIC"],pros:["Mükemmel lüks SUV","Teknoloji dolu"],cons:["Çok pahalı"],scores:{guvenilirlik:78,konfor:94,surusKeyfi:80,ekonomi:62,teknoloji:96},reviews:[]},
+  {id:40,brand:"audi",model:"A3",variant:"35 TFSI 150bg",year:"2020-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TFSI 4sil",transmission:"7-S tronic",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1385 kg",dims:"4343×1816×1426 mm",wb:"2631 mm",trunk:"325 L",seats:5,drive:"Önden Çekiş",price:"1.800.000–2.800.000 ₺",cat:"Sedan",tags:["Premium","Virtual Cockpit"],pros:["Virtual Cockpit mükemmel","Kaliteli"],cons:["Bagaj küçük","Arka dar"],scores:{guvenilirlik:77,konfor:80,surusKeyfi:82,ekonomi:72,teknoloji:92},reviews:[]},
+  {id:41,brand:"audi",model:"A4",variant:"35 TFSI 150bg",year:"2019-2024",fuel:"Benzin",power:"150 bg",torque:"270 Nm",engine:"2.0L TFSI 4sil",transmission:"7-S tronic",consumption:"6.0 L/100km",co2:"138 g/km",weight:"1520 kg",dims:"4762×1842×1427 mm",wb:"2820 mm",trunk:"480 L",seats:5,drive:"Önden Çekiş",price:"2.800.000–4.500.000 ₺",cat:"Sedan",tags:["Business","Teknoloji"],pros:["Elegant tasarım","Teknoloji"],cons:["Fiyat çok yüksek"],scores:{guvenilirlik:77,konfor:86,surusKeyfi:80,ekonomi:68,teknoloji:90},reviews:[]},
+  {id:50,brand:"renault",model:"Clio",variant:"1.0 TCe 100bg",year:"2020-2024",fuel:"Benzin",power:"100 bg",torque:"160 Nm",engine:"1.0L TCe 3sil",transmission:"CVT/Manuel",consumption:"4.8 L/100km",co2:"109 g/km",weight:"1228 kg",dims:"4050×1798×1448 mm",wb:"2583 mm",trunk:"391 L",seats:5,drive:"Önden Çekiş",price:"650.000–1.100.000 ₺",cat:"Hatchback",tags:["Ekonomik","Şık"],pros:["Uygun fiyat","Şık Fransız tasarımı"],cons:["3 silindir motor","CVT performansı"],scores:{guvenilirlik:72,konfor:72,surusKeyfi:65,ekonomi:88,teknoloji:72},reviews:[{name:"Selin A.",userId:null,date:"Mart 2024",stars:4,text:"Fiyat/performans oranı çok iyi."}]},
+  {id:51,brand:"renault",model:"Megane",variant:"1.3 TCe 140bg",year:"2020-2024",fuel:"Benzin",power:"140 bg",torque:"240 Nm",engine:"1.3L TCe 4sil",transmission:"7-EDC",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1380 kg",dims:"4358×1814×1443 mm",wb:"2670 mm",trunk:"434 L",seats:5,drive:"Önden Çekiş",price:"950.000–1.400.000 ₺",cat:"Hatchback",tags:["Konfor","Aile"],pros:["Geniş iç mekan","Konforlu"],cons:["Yakıt tüketimi yüksek"],scores:{guvenilirlik:74,konfor:78,surusKeyfi:72,ekonomi:75,teknoloji:76},reviews:[]},
+  {id:52,brand:"renault",model:"Duster",variant:"1.3 TCe 150bg 4x4",year:"2018-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.3L TCe 4sil",transmission:"Manuel/CVT",consumption:"7.0 L/100km",co2:"160 g/km",weight:"1450 kg",dims:"4341×1804×1693 mm",wb:"2674 mm",trunk:"445 L",seats:5,drive:"4×4 Seçilebilir",price:"900.000–1.500.000 ₺",cat:"SUV",tags:["4x4","Offroad"],pros:["En uygun fiyatlı 4x4"],cons:["İç mekan kalitesi düşük"],scores:{guvenilirlik:75,konfor:62,surusKeyfi:65,ekonomi:70,teknoloji:58},reviews:[]},
+  {id:60,brand:"peugeot",model:"208",variant:"1.2 PureTech 100bg",year:"2020-2024",fuel:"Benzin",power:"100 bg",torque:"205 Nm",engine:"1.2L EB2 3sil",transmission:"8-EAT",consumption:"5.0 L/100km",co2:"115 g/km",weight:"1215 kg",dims:"4055×1745×1430 mm",wb:"2538 mm",trunk:"311 L",seats:5,drive:"Önden Çekiş",price:"700.000–1.100.000 ₺",cat:"Hatchback",tags:["i-Cockpit","Tasarım"],pros:["i-Cockpit devrimsel","Şık tasarım"],cons:["Küçük bagaj","3 silindir"],scores:{guvenilirlik:70,konfor:68,surusKeyfi:68,ekonomi:86,teknoloji:82},reviews:[]},
+  {id:61,brand:"peugeot",model:"308",variant:"1.2 PureTech 130bg",year:"2022-2024",fuel:"Benzin",power:"130 bg",torque:"230 Nm",engine:"1.2L PureTech 3sil",transmission:"8-EAT",consumption:"5.5 L/100km",co2:"126 g/km",weight:"1352 kg",dims:"4395×1852×1471 mm",wb:"2675 mm",trunk:"412 L",seats:5,drive:"Önden Çekiş",price:"1.100.000–1.700.000 ₺",cat:"Hatchback",tags:["Yeni nesil"],pros:["Çarpıcı tasarım","Panoramik ekran"],cons:["3 silindir","Karmaşık menü"],scores:{guvenilirlik:72,konfor:78,surusKeyfi:72,ekonomi:80,teknoloji:85},reviews:[]},
+  {id:70,brand:"ford",model:"Focus",variant:"1.5 EcoBoost 182bg",year:"2019-2023",fuel:"Benzin",power:"182 bg",torque:"280 Nm",engine:"1.5L EcoBoost 3sil",transmission:"8-Otomatik",consumption:"6.0 L/100km",co2:"137 g/km",weight:"1360 kg",dims:"4378×1825×1454 mm",wb:"2700 mm",trunk:"375 L",seats:5,drive:"Önden Çekiş",price:"1.000.000–1.600.000 ₺",cat:"Hatchback",tags:["Dinamik","Güvenlik"],pros:["Üstün sürüş dinamiği"],cons:["3 silindir güvenilirlik"],scores:{guvenilirlik:73,konfor:75,surusKeyfi:85,ekonomi:74,teknoloji:78},reviews:[{name:"Mustafa E.",userId:null,date:"Ocak 2024",stars:4,text:"Ford'un sürüş dinamiğini hep sevmişimdir."}]},
+  {id:71,brand:"ford",model:"Puma",variant:"1.0 EcoBoost 125bg mHEV",year:"2020-2024",fuel:"Benzin/Mild Hybrid",power:"125 bg",torque:"210 Nm",engine:"1.0L EcoBoost 3sil",transmission:"7-DCT",consumption:"5.4 L/100km",co2:"124 g/km",weight:"1360 kg",dims:"4208×1805×1545 mm",wb:"2588 mm",trunk:"456 L",seats:5,drive:"Önden Çekiş",price:"1.000.000–1.600.000 ₺",cat:"SUV",tags:["MegaBox","Pratik"],pros:["MegaBox benzersiz"],cons:["3 silindir"],scores:{guvenilirlik:74,konfor:72,surusKeyfi:70,ekonomi:83,teknoloji:76},reviews:[]},
+  {id:80,brand:"hyundai",model:"i20",variant:"1.0 T-GDi 100bg",year:"2021-2024",fuel:"Benzin",power:"100 bg",torque:"172 Nm",engine:"1.0L T-GDi 3sil",transmission:"7-DCT",consumption:"5.0 L/100km",co2:"114 g/km",weight:"1160 kg",dims:"4040×1775×1490 mm",wb:"2580 mm",trunk:"352 L",seats:5,drive:"Önden Çekiş",price:"650.000–1.000.000 ₺",cat:"Hatchback",tags:["Modern","Şehir"],pros:["Modern iç mekan","Uygun fiyat"],cons:["3 silindir titreşim"],scores:{guvenilirlik:80,konfor:68,surusKeyfi:65,ekonomi:86,teknoloji:78},reviews:[]},
+  {id:81,brand:"hyundai",model:"i30",variant:"1.5 T-GDi 160bg",year:"2020-2024",fuel:"Benzin",power:"160 bg",torque:"253 Nm",engine:"1.5L T-GDi 4sil",transmission:"7-DCT",consumption:"5.8 L/100km",co2:"133 g/km",weight:"1350 kg",dims:"4340×1796×1455 mm",wb:"2650 mm",trunk:"395 L",seats:5,drive:"Önden Çekiş",price:"950.000–1.500.000 ₺",cat:"Hatchback",tags:["Güvenilir","Teknoloji"],pros:["Güvenilir motor","İyi donanım"],cons:["İç mekan plastik"],scores:{guvenilirlik:84,konfor:76,surusKeyfi:72,ekonomi:78,teknoloji:80},reviews:[]},
+  {id:82,brand:"hyundai",model:"Tucson",variant:"1.6 T-GDi Hibrit",year:"2021-2024",fuel:"Benzin/Hibrit",power:"230 bg",torque:"253 Nm",engine:"1.6L T-GDi+E-motor",transmission:"6-DCT",consumption:"6.1 L/100km",co2:"140 g/km",weight:"1715 kg",dims:"4500×1865×1665 mm",wb:"2680 mm",trunk:"620 L",seats:5,drive:"ÖÇ/4WD",price:"1.800.000–2.800.000 ₺",cat:"SUV",tags:["Aile SUV","Hibrit"],pros:["Geniş bagaj","Hibrit ekonomi"],cons:["Ağır araç"],scores:{guvenilirlik:82,konfor:82,surusKeyfi:68,ekonomi:80,teknoloji:84},reviews:[]},
+  {id:90,brand:"kia",model:"Sportage",variant:"1.6 T-GDi Hibrit",year:"2022-2024",fuel:"Benzin/Hibrit",power:"230 bg",torque:"265 Nm",engine:"1.6L T-GDi+E-motor",transmission:"6-DCT",consumption:"5.9 L/100km",co2:"136 g/km",weight:"1740 kg",dims:"4515×1865×1645 mm",wb:"2680 mm",trunk:"587 L",seats:5,drive:"ÖÇ/AWD",price:"1.900.000–3.000.000 ₺",cat:"SUV",tags:["Modern","Hibrit"],pros:["Çarpıcı tasarım","Hibrit ekonomi"],cons:["Yüksek fiyat"],scores:{guvenilirlik:83,konfor:82,surusKeyfi:72,ekonomi:80,teknoloji:86},reviews:[]},
+  {id:91,brand:"kia",model:"Ceed",variant:"1.5 T-GDi 160bg",year:"2019-2024",fuel:"Benzin",power:"160 bg",torque:"253 Nm",engine:"1.5L T-GDi 4sil",transmission:"7-DCT",consumption:"5.7 L/100km",co2:"130 g/km",weight:"1340 kg",dims:"4310×1800×1455 mm",wb:"2650 mm",trunk:"395 L",seats:5,drive:"Önden Çekiş",price:"950.000–1.500.000 ₺",cat:"Hatchback",tags:["7 yıl garanti"],pros:["7 yıl garanti","Güvenilir"],cons:["Sürüş keyfi sıradan"],scores:{guvenilirlik:85,konfor:75,surusKeyfi:68,ekonomi:78,teknoloji:78},reviews:[]},
+  {id:100,brand:"skoda",model:"Octavia",variant:"1.5 TSI 150bg",year:"2020-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TSI 4sil",transmission:"7-DSG",consumption:"5.7 L/100km",co2:"130 g/km",weight:"1370 kg",dims:"4689×1829×1468 mm",wb:"2686 mm",trunk:"600 L",seats:5,drive:"Önden Çekiş",price:"1.200.000–1.900.000 ₺",cat:"Sedan",tags:["Dev bagaj","VW grubu"],pros:["Dev bagaj","VW mekanik","İyi fiyat"],cons:["Tasarım sade"],scores:{guvenilirlik:80,konfor:80,surusKeyfi:74,ekonomi:78,teknoloji:80},reviews:[]},
+  {id:101,brand:"skoda",model:"Karoq",variant:"1.5 TSI 150bg",year:"2018-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TSI 4sil",transmission:"7-DSG",consumption:"6.0 L/100km",co2:"137 g/km",weight:"1430 kg",dims:"4382×1841×1605 mm",wb:"2638 mm",trunk:"521 L",seats:5,drive:"ÖÇ/4x4",price:"1.500.000–2.300.000 ₺",cat:"SUV",tags:["VW grubu","Aile"],pros:["Geniş iç mekan","VW mekanik"],cons:["Tasarım yavan"],scores:{guvenilirlik:80,konfor:80,surusKeyfi:70,ekonomi:74,teknoloji:78},reviews:[]},
+  {id:110,brand:"seat",model:"Leon",variant:"1.5 TSI 150bg FR",year:"2020-2024",fuel:"Benzin",power:"150 bg",torque:"250 Nm",engine:"1.5L TSI 4sil",transmission:"7-DSG",consumption:"5.7 L/100km",co2:"129 g/km",weight:"1345 kg",dims:"4368×1800×1456 mm",wb:"2686 mm",trunk:"380 L",seats:5,drive:"Önden Çekiş",price:"1.100.000–1.700.000 ₺",cat:"Hatchback",tags:["Spor FR"],pros:["FR spor görünüm","VW mekanik"],cons:["Servis ağı dar"],scores:{guvenilirlik:79,konfor:76,surusKeyfi:82,ekonomi:76,teknoloji:80},reviews:[]},
+  {id:120,brand:"volvo",model:"XC40",variant:"B3 163bg mHEV",year:"2020-2024",fuel:"Benzin/Mild Hybrid",power:"163 bg",torque:"265 Nm",engine:"1.5L T3+mHEV",transmission:"8-Geartronic",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1710 kg",dims:"4425×1863×1651 mm",wb:"2702 mm",trunk:"460 L",seats:5,drive:"Önden Çekiş",price:"3.000.000–4.500.000 ₺",cat:"SUV",tags:["İsveç güvenliği"],pros:["En iyi güvenlik","Google entegrasyon"],cons:["3 silindir ses","Çok yüksek fiyat"],scores:{guvenilirlik:80,konfor:88,surusKeyfi:72,ekonomi:70,teknoloji:92},reviews:[]},
+  {id:130,brand:"honda",model:"Civic",variant:"1.5 VTEC Turbo 182bg",year:"2022-2024",fuel:"Benzin",power:"182 bg",torque:"240 Nm",engine:"1.5L VTEC Turbo 4sil",transmission:"CVT/Manuel",consumption:"6.2 L/100km",co2:"141 g/km",weight:"1380 kg",dims:"4674×1802×1415 mm",wb:"2735 mm",trunk:"519 L",seats:5,drive:"Önden Çekiş",price:"1.500.000–2.000.000 ₺",cat:"Sedan",tags:["Honda güvenilirliği"],pros:["Honda güvenilirliği","Geniş bagaj"],cons:["CVT tepkisi"],scores:{guvenilirlik:88,konfor:76,surusKeyfi:80,ekonomi:74,teknoloji:78},reviews:[]},
+  {id:140,brand:"nissan",model:"Qashqai",variant:"1.3 DIG-T 158bg mHEV",year:"2021-2024",fuel:"Benzin/mHEV",power:"158 bg",torque:"260 Nm",engine:"1.3L DIG-T 4sil",transmission:"Xtronic CVT",consumption:"6.1 L/100km",co2:"140 g/km",weight:"1490 kg",dims:"4425×1835×1625 mm",wb:"2665 mm",trunk:"504 L",seats:5,drive:"ÖÇ/4WD",price:"1.400.000–2.200.000 ₺",cat:"SUV",tags:["Konfor","Aile"],pros:["Konforlu süspansiyon"],cons:["CVT tepkisi"],scores:{guvenilirlik:76,konfor:80,surusKeyfi:66,ekonomi:74,teknoloji:80},reviews:[]},
+  {id:150,brand:"mazda",model:"Mazda3",variant:"e-SKYACTIV-G 150bg",year:"2019-2024",fuel:"Benzin",power:"150 bg",torque:"213 Nm",engine:"2.0L SKYACTIV-G 4sil",transmission:"6-Otomatik",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1415 kg",dims:"4662×1797×1440 mm",wb:"2726 mm",trunk:"444 L",seats:5,drive:"Önden Çekiş",price:"1.500.000–2.100.000 ₺",cat:"Sedan",tags:["KODO tasarım"],pros:["KODO tasarım eşsiz","Sürüş keyfi"],cons:["Navigasyon kullanışsız"],scores:{guvenilirlik:87,konfor:82,surusKeyfi:88,ekonomi:74,teknoloji:76},reviews:[]},
+  {id:160,brand:"opel",model:"Astra",variant:"1.2 Turbo 130bg",year:"2022-2024",fuel:"Benzin",power:"130 bg",torque:"230 Nm",engine:"1.2L Turbo 3sil",transmission:"8-EAT8",consumption:"5.6 L/100km",co2:"128 g/km",weight:"1325 kg",dims:"4374×1860×1452 mm",wb:"2675 mm",trunk:"422 L",seats:5,drive:"Önden Çekiş",price:"850.000–1.400.000 ₺",cat:"Hatchback",tags:["Yeni nesil"],pros:["Yeni nesil pure panel","Ekonomik"],cons:["3 silindir","Servis ağı"],scores:{guvenilirlik:72,konfor:76,surusKeyfi:70,ekonomi:82,teknoloji:82},reviews:[]},
+  {id:170,brand:"fiat",model:"Egea",variant:"1.0 Firefly 100bg",year:"2020-2024",fuel:"Benzin",power:"100 bg",torque:"190 Nm",engine:"1.0L Firefly 3sil",transmission:"6-CVT/Manuel",consumption:"4.8 L/100km",co2:"110 g/km",weight:"1135 kg",dims:"4568×1792×1495 mm",wb:"2636 mm",trunk:"510 L",seats:5,drive:"Önden Çekiş",price:"600.000–1.000.000 ₺",cat:"Sedan",tags:["Ekonomik","Yerli üretim"],pros:["Dev bagaj","Türkiye'de üretim","En uygun"],cons:["3 silindir performans"],scores:{guvenilirlik:70,konfor:65,surusKeyfi:55,ekonomi:90,teknoloji:62},reviews:[]},
+  {id:180,brand:"alfa",model:"Giulia",variant:"2.0 Turbo 200bg",year:"2016-2024",fuel:"Benzin",power:"200 bg",torque:"330 Nm",engine:"2.0L GME 4sil",transmission:"8-ZF",consumption:"7.0 L/100km",co2:"159 g/km",weight:"1500 kg",dims:"4643×1876×1436 mm",wb:"2820 mm",trunk:"480 L",seats:5,drive:"Arkadan Çekiş",price:"4.000.000–7.000.000 ₺",cat:"Sedan",tags:["İtalyan ruh","Spor"],pros:["Efsane sürüş keyfi","İtalyan tasarım ikonu"],cons:["Güvenilirlik sorunu","Pahalı bakım"],scores:{guvenilirlik:62,konfor:76,surusKeyfi:95,ekonomi:58,teknoloji:78},reviews:[]},
+  {id:200,brand:"jeep",model:"Renegade",variant:"1.3 T-GDi 150bg 4WD",year:"2019-2024",fuel:"Benzin",power:"150 bg",torque:"270 Nm",engine:"1.3L GSE 4sil",transmission:"9-DDCT",consumption:"7.0 L/100km",co2:"160 g/km",weight:"1520 kg",dims:"4255×1805×1694 mm",wb:"2570 mm",trunk:"351 L",seats:5,drive:"4×4 Jeep",price:"1.500.000–2.500.000 ₺",cat:"SUV",tags:["4x4","Jeep ruhu"],pros:["Jeep 4x4 kabiliyeti"],cons:["Küçük bagaj","Yüksek tüketim"],scores:{guvenilirlik:68,konfor:68,surusKeyfi:65,ekonomi:62,teknoloji:68},reviews:[]},
+  {id:220,brand:"mini",model:"Hatch Cooper S",variant:"192bg",year:"2021-2024",fuel:"Benzin",power:"192 bg",torque:"280 Nm",engine:"2.0L TwinPower 4sil",transmission:"7-Steptronic",consumption:"6.4 L/100km",co2:"146 g/km",weight:"1305 kg",dims:"3855×1727×1415 mm",wb:"2495 mm",trunk:"211 L",seats:4,drive:"Önden Çekiş",price:"2.000.000–3.200.000 ₺",cat:"Hatchback",tags:["İkonik","Sürüş keyfi"],pros:["Efsanevi sürüş","İkonik tasarım"],cons:["Küçük bagaj","4 koltuk"],scores:{guvenilirlik:72,konfor:70,surusKeyfi:90,ekonomi:66,teknoloji:82},reviews:[]},
+  {id:230,brand:"tesla",model:"Model 3",variant:"Standart Menzil RWD",year:"2019-2024",fuel:"Elektrik",power:"283 bg",torque:"420 Nm",engine:"Tek E-motor (arka)",transmission:"Tek vitesli",consumption:"14.3 kWh/100km",co2:"0 g/km",weight:"1752 kg",dims:"4694×1850×1443 mm",wb:"2875 mm",trunk:"542 L",seats:5,drive:"Arkadan Çekiş",price:"2.500.000–4.000.000 ₺",cat:"Sedan (EV)",tags:["Elektrikli","Autopilot"],pros:["Düşük işletme maliyeti","Autopilot üstün"],cons:["Yüksek fiyat","Şarj altyapısı"],scores:{guvenilirlik:78,konfor:80,surusKeyfi:90,ekonomi:95,teknoloji:98},reviews:[]},
+  {id:231,brand:"tesla",model:"Model Y",variant:"Long Range AWD",year:"2021-2024",fuel:"Elektrik",power:"514 bg",torque:"493 Nm",engine:"Çift E-motor AWD",transmission:"Tek vitesli",consumption:"15.7 kWh/100km",co2:"0 g/km",weight:"1979 kg",dims:"4751×1921×1624 mm",wb:"2890 mm",trunk:"854 L",seats:5,drive:"AWD",price:"3.500.000–5.500.000 ₺",cat:"SUV (EV)",tags:["Elektrikli SUV","Uzun menzil"],pros:["Büyük bagaj","AWD performans","Uzun menzil"],cons:["Çok yüksek fiyat"],scores:{guvenilirlik:78,konfor:84,surusKeyfi:88,ekonomi:94,teknoloji:98},reviews:[]},
+  {id:240,brand:"byd",model:"Atto 3",variant:"EV 60.5 kWh",year:"2023-2024",fuel:"Elektrik",power:"204 bg",torque:"310 Nm",engine:"E-motor (ön)",transmission:"Tek vitesli",consumption:"16.5 kWh/100km",co2:"0 g/km",weight:"1750 kg",dims:"4455×1875×1615 mm",wb:"2720 mm",trunk:"440 L",seats:5,drive:"Önden Çekiş",price:"1.800.000–2.500.000 ₺",cat:"SUV (EV)",tags:["EV","Blade batarya"],pros:["Fiyat/teknoloji oranı iyi"],cons:["Marka bilinirliği düşük"],scores:{guvenilirlik:72,konfor:74,surusKeyfi:70,ekonomi:88,teknoloji:82},reviews:[]},
+  {id:260,brand:"mg",model:"MG4 EV",variant:"EV 64 kWh",year:"2023-2024",fuel:"Elektrik",power:"204 bg",torque:"250 Nm",engine:"E-motor (arka)",transmission:"Tek vitesli",consumption:"15.7 kWh/100km",co2:"0 g/km",weight:"1655 kg",dims:"4287×1836×1504 mm",wb:"2705 mm",trunk:"363 L",seats:5,drive:"Arkadan Çekiş",price:"1.200.000–1.800.000 ₺",cat:"Hatchback (EV)",tags:["Ucuz EV"],pros:["Menzil/fiyat çok iyi","Modern tasarım"],cons:["Uzun vadeli güvenilirlik bilinmiyor"],scores:{guvenilirlik:65,konfor:72,surusKeyfi:78,ekonomi:90,teknoloji:80},reviews:[]},
+  {id:270,brand:"togg",model:"T10X",variant:"Extended Range RWD",year:"2023-2024",fuel:"Elektrik",power:"200 bg",torque:"350 Nm",engine:"E-motor (arka)",transmission:"Tek vitesli",consumption:"16.0 kWh/100km",co2:"0 g/km",weight:"2100 kg",dims:"4559×1900×1648 mm",wb:"2765 mm",trunk:"530 L",seats:5,drive:"Arkadan Çekiş",price:"1.800.000–2.800.000 ₺",cat:"SUV (EV)",tags:["Türkiye yapımı","Yerli EV"],pros:["Türk mühendisliği","Rekabetçi fiyat"],cons:["Genç marka","Ağır araç"],scores:{guvenilirlik:65,konfor:76,surusKeyfi:72,ekonomi:82,teknoloji:84},reviews:[]},
+  {id:271,brand:"togg",model:"T10F",variant:"AWD 400bg",year:"2024",fuel:"Elektrik",power:"400 bg",torque:"700 Nm",engine:"Çift E-motor AWD",transmission:"Tek vitesli",consumption:"18.0 kWh/100km",co2:"0 g/km",weight:"2200 kg",dims:"4620×1910×1500 mm",wb:"2770 mm",trunk:"460 L",seats:5,drive:"AWD",price:"2.500.000–3.500.000 ₺",cat:"SUV (EV)",tags:["Güçlü","AWD","Yerli"],pros:["Güçlü AWD","Yerli teknoloji"],cons:["Yüksek fiyat","Yeni marka"],scores:{guvenilirlik:65,konfor:78,surusKeyfi:82,ekonomi:78,teknoloji:86},reviews:[]},
+  {id:300,brand:"subaru",model:"Forester",variant:"e-BOXER 150bg AWD",year:"2019-2024",fuel:"Benzin/mHEV",power:"150 bg",torque:"194 Nm",engine:"2.0L Boxer+E-motor",transmission:"CVT Lineartronic",consumption:"6.7 L/100km",co2:"153 g/km",weight:"1590 kg",dims:"4640×1815×1730 mm",wb:"2670 mm",trunk:"520 L",seats:5,drive:"AWD Simetrik",price:"2.000.000–3.200.000 ₺",cat:"SUV",tags:["AWD","Boxer motor"],pros:["Simetrik AWD üstün","Boxer güvenilirliği"],cons:["CVT performansı","İç mekan plastik"],scores:{guvenilirlik:84,konfor:72,surusKeyfi:70,ekonomi:65,teknoloji:70},reviews:[]},
+  {id:310,brand:"suzuki",model:"Swift",variant:"1.2 DualJet Hibrit",year:"2021-2024",fuel:"Benzin/Hibrit",power:"83 bg",torque:"107 Nm",engine:"1.2L DualJet 4sil",transmission:"Manuel/CVT",consumption:"4.6 L/100km",co2:"105 g/km",weight:"925 kg",dims:"3845×1695×1500 mm",wb:"2450 mm",trunk:"268 L",seats:5,drive:"Önden Çekiş",price:"500.000–800.000 ₺",cat:"Hatchback",tags:["Ultra ekonomik"],pros:["En hafif sınıfında","Çok düşük tüketim"],cons:["Çok küçük","Motor performansı düşük"],scores:{guvenilirlik:85,konfor:55,surusKeyfi:55,ekonomi:95,teknoloji:60},reviews:[]},
+  {id:311,brand:"suzuki",model:"Vitara",variant:"1.5 AllGrip Hibrit",year:"2019-2024",fuel:"Benzin/Hibrit",power:"129 bg",torque:"220 Nm",engine:"1.5L 4sil+E-motor",transmission:"6-SHVS Otomatik",consumption:"5.8 L/100km",co2:"132 g/km",weight:"1265 kg",dims:"4175×1775×1610 mm",wb:"2500 mm",trunk:"375 L",seats:5,drive:"4WD AllGrip",price:"950.000–1.400.000 ₺",cat:"SUV",tags:["Uygun 4x4"],pros:["Uygun fiyatlı 4WD","Hibrit ekonomi"],cons:["İç mekan kalitesi sınırlı"],scores:{guvenilirlik:82,konfor:65,surusKeyfi:60,ekonomi:84,teknoloji:64},reviews:[]},
+  {id:320,brand:"citroen",model:"C3",variant:"1.2 PureTech 110bg",year:"2022-2024",fuel:"Benzin",power:"110 bg",torque:"205 Nm",engine:"1.2L PureTech 3sil",transmission:"6-EAT6",consumption:"5.2 L/100km",co2:"119 g/km",weight:"1195 kg",dims:"3981×1748×1528 mm",wb:"2540 mm",trunk:"315 L",seats:5,drive:"Önden Çekiş",price:"600.000–950.000 ₺",cat:"Hatchback",tags:["Konfor","Fransız"],pros:["Aşırı rahat süspansiyon","Uygun fiyat"],cons:["3 silindir","Yönetim hissi yok"],scores:{guvenilirlik:70,konfor:82,surusKeyfi:55,ekonomi:86,teknoloji:68},reviews:[]},
+  {id:330,brand:"mitsubishi",model:"Outlander",variant:"PHEV 302bg",year:"2022-2024",fuel:"Benzin/PHEV",power:"302 bg",torque:"203 Nm",engine:"2.4L Atkinson+2 E-motor",transmission:"CVT",consumption:"2.0 L/100km",co2:"46 g/km",weight:"2110 kg",dims:"4710×1862×1745 mm",wb:"2705 mm",trunk:"463 L",seats:7,drive:"AWD PHEV",price:"3.500.000–5.000.000 ₺",cat:"SUV",tags:["PHEV","7 koltuk"],pros:["7 koltuklu PHEV","Çok düşük tüketim"],cons:["Ağır araç","Yüksek fiyat"],scores:{guvenilirlik:78,konfor:80,surusKeyfi:62,ekonomi:85,teknoloji:78},reviews:[]},
+  {id:340,brand:"jaguar",model:"F-PACE",variant:"P250 250bg AWD",year:"2017-2024",fuel:"Benzin",power:"250 bg",torque:"365 Nm",engine:"2.0L Turbo 4sil",transmission:"8-Otomatik",consumption:"8.5 L/100km",co2:"193 g/km",weight:"1835 kg",dims:"4731×1936×1658 mm",wb:"2874 mm",trunk:"650 L",seats:5,drive:"AWD",price:"5.000.000–10.000.000 ₺",cat:"SUV",tags:["İngiliz lüksü","Spor SUV"],pros:["Spor sürüş SUV'da","Zarif tasarım"],cons:["Güvenilirlik sorunu","Bakım çok pahalı"],scores:{guvenilirlik:55,konfor:84,surusKeyfi:88,ekonomi:45,teknoloji:78},reviews:[]},
+  {id:350,brand:"porsche",model:"Cayenne",variant:"3.0 V6 340bg",year:"2018-2024",fuel:"Benzin",power:"340 bg",torque:"450 Nm",engine:"3.0L V6 Turbo",transmission:"8-Tiptronic",consumption:"9.5 L/100km",co2:"216 g/km",weight:"2095 kg",dims:"4918×1983×1696 mm",wb:"2895 mm",trunk:"770 L",seats:5,drive:"AWD PTM",price:"10.000.000–20.000.000 ₺",cat:"SUV",tags:["Ultra lüks","Spor SUV"],pros:["Porsche sürüş keyfi SUV'da","Geniş lüks iç"],cons:["Çok yüksek fiyat","Bakım çok pahalı"],scores:{guvenilirlik:80,konfor:92,surusKeyfi:95,ekonomi:40,teknoloji:90},reviews:[]},
+  {id:360,brand:"genesis",model:"GV70",variant:"2.5T 304bg AWD",year:"2021-2024",fuel:"Benzin",power:"304 bg",torque:"422 Nm",engine:"2.5L Turbo 4sil",transmission:"8-Otomatik",consumption:"8.2 L/100km",co2:"187 g/km",weight:"1915 kg",dims:"4715×1910×1630 mm",wb:"2875 mm",trunk:"542 L",seats:5,drive:"AWD",price:"4.500.000–7.000.000 ₺",cat:"SUV",tags:["Kore lüksü","AWD"],pros:["BMW fiyatıyla üstün donanım","5 yıl garanti"],cons:["Marka prestiji düşük"],scores:{guvenilirlik:82,konfor:90,surusKeyfi:82,ekonomi:55,teknoloji:92},reviews:[]},
+];
+
+// ===================== AUTH SYSTEM =====================
+const ADMIN_USER = { username:"admin", password:"admin123", isAdmin:true };
+let users = JSON.parse(localStorage.getItem("ay_users")||"[]");
+let currentUser = JSON.parse(localStorage.getItem("ay_current")||"null");
+let pendingReviews = JSON.parse(localStorage.getItem("ay_pending")||"[]");
+let carPhotos = JSON.parse(localStorage.getItem("ay_photos")||"{}");
+let customCars = JSON.parse(localStorage.getItem("ay_custom_cars")||"[]");
+let deletedIds = JSON.parse(localStorage.getItem("ay_deleted")||"[]");
+
+// Merge custom cars, remove deleted
+customCars.forEach(c=>{if(!CARS.find(x=>x.id===c.id))CARS.push(c);});
+deletedIds.forEach(id=>{const i=CARS.findIndex(c=>c.id===id);if(i>=0)CARS.splice(i,1);});
+
+function saveAll(){
+  localStorage.setItem("ay_users",JSON.stringify(users));
+  localStorage.setItem("ay_current",JSON.stringify(currentUser));
+  localStorage.setItem("ay_pending",JSON.stringify(pendingReviews));
+  localStorage.setItem("ay_photos",JSON.stringify(carPhotos));
+  localStorage.setItem("ay_custom_cars",JSON.stringify(customCars));
+  localStorage.setItem("ay_deleted",JSON.stringify(deletedIds));
+}
+
+// ===================== STATE =====================
+let selectedCar=null, activeBrand=null, compareList=[], activeCat="Tümü", photoIdx=0;
+const SCORE_LABELS={guvenilirlik:"Güvenilirlik",konfor:"Konfor",surusKeyfi:"Sürüş Keyfi",ekonomi:"Ekonomi",teknoloji:"Teknoloji"};
+const CATS=["Tümü","Sedan","Hatchback","SUV","Sedan (EV)","SUV (EV)","Hatchback (EV)"];
+const FUELS=["Benzin","Dizel","Benzin/Hibrit","Benzin/Mild Hybrid","Elektrik","Benzin/PHEV"];
+const BRAND_CATS=["Sedan","Hatchback","SUV","Sedan (EV)","SUV (EV)","Hatchback (EV)"];
+
+// ===================== HELPERS =====================
+function getAvg(car){if(!car.reviews.length)return 0;return(car.reviews.reduce((s,r)=>s+r.stars,0)/car.reviews.length).toFixed(1);}
+function starsHtml(n,sz=11){return`<span style="color:#f59e0b;font-size:${sz}px;letter-spacing:1px">${"★".repeat(Math.round(n))}${"☆".repeat(5-Math.round(n))}</span>`;}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+function closeAllModals(){document.querySelectorAll(".modal-overlay").forEach(m=>m.remove());}
+
+// ===================== TOPBAR =====================
+function renderTopbar(){
+  const el=document.getElementById("tbRight");
+  if(currentUser){
+    if(currentUser.isAdmin){
+      el.innerHTML=`
+        <button class="tb-btn admin" onclick="openAdminPanel()">⚙️ Admin Paneli</button>
+        <div class="user-chip" onclick="openProfile()">
+          <div class="user-av">A</div>
+          <span class="user-name">Admin</span>
+        </div>
+        <button class="tb-btn" onclick="logout()" style="font-size:11px">Çıkış</button>
+        <button class="compare-pill" onclick="openCompare()">⚡ Karşılaştır <span class="cnt-badge" id="cmpCnt">${compareList.length}</span></button>`;
+    } else {
+      const initials=currentUser.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+      el.innerHTML=`
+        <div class="user-chip" onclick="openProfile()">
+          <div class="user-av" style="background:var(--blue)">${initials}</div>
+          <span class="user-name">${currentUser.name.split(" ")[0]}</span>
+        </div>
+        <button class="tb-btn" onclick="logout()" style="font-size:11px">Çıkış</button>
+        <button class="compare-pill" onclick="openCompare()">⚡ Karşılaştır <span class="cnt-badge" id="cmpCnt">${compareList.length}</span></button>`;
+    }
+  } else {
+    el.innerHTML=`
+      <button class="tb-btn" onclick="showLogin()">Giriş Yap</button>
+      <button class="tb-btn accent" onclick="showRegister()">Üye Ol</button>
+      <button class="compare-pill" onclick="openCompare()">⚡ Karşılaştır <span class="cnt-badge" id="cmpCnt">${compareList.length}</span></button>`;
+  }
+}
+
+function logout(){currentUser=null;saveAll();renderTopbar();if(selectedCar)renderCenter();toast("Çıkış yapıldı.");}
+
+// ===================== AUTH MODALS =====================
+function showLogin(){
+  closeAllModals();
+  const o=document.createElement("div");
+  o.className="modal-overlay";
+  o.innerHTML=`<div class="modal-box" style="max-width:340px">
+    <div class="modal-head"><h3>🔐 Giriş Yap</h3><button class="modal-close" onclick="closeAllModals()">✕</button></div>
+    <div class="ml-input-wrap"><label>Kullanıcı Adı</label><input id="li_user" type="text" placeholder="kullaniciadi" autocomplete="username"></div>
+    <div class="ml-input-wrap"><label>Şifre</label><input id="li_pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <div class="err-msg" id="li_err">Kullanıcı adı veya şifre hatalı!</div>
+    <button class="ml-btn" onclick="doLogin()">Giriş Yap</button>
+    <div class="switch-link">Hesabın yok mu? <span onclick="showRegister()">Üye Ol</span></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);text-align:center">Yönetici girişi için kullanıcı adı: <b style="color:var(--text2)">admin</b></div>
+  </div>`;
+  document.body.appendChild(o);
+  o.querySelector("#li_user").focus();
+  o.querySelector("#li_pass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+}
+
+function doLogin(){
+  const u=document.getElementById("li_user").value.trim();
+  const p=document.getElementById("li_pass").value;
+  if(u==="admin"&&p===ADMIN_USER.password){
+    currentUser={...ADMIN_USER};saveAll();closeAllModals();renderTopbar();toast("Admin olarak giriş yapıldı. Hoş geldiniz! ⚙️");return;
+  }
+  const found=users.find(x=>x.username===u&&x.password===p);
+  if(found){currentUser=found;saveAll();closeAllModals();renderTopbar();if(selectedCar)renderCenter();toast(`Hoş geldiniz, ${found.name.split(" ")[0]}! 👋`);}
+  else{document.getElementById("li_err").style.display="block";}
+}
+
+function showRegister(){
+  closeAllModals();
+  const o=document.createElement("div");
+  o.className="modal-overlay";
+  o.innerHTML=`<div class="modal-box" style="max-width:360px">
+    <div class="modal-head"><h3>✨ Üye Ol</h3><button class="modal-close" onclick="closeAllModals()">✕</button></div>
+    <div class="ml-input-wrap"><label>Ad Soyad</label><input id="rg_name" type="text" placeholder="Ali Yılmaz"></div>
+    <div class="ml-input-wrap"><label>E-posta</label><input id="rg_email" type="email" placeholder="ali@example.com"></div>
+    <div class="ml-input-wrap"><label>Kullanıcı Adı</label><input id="rg_user" type="text" placeholder="kullaniciadi (min 3 karakter)"></div>
+    <div class="ml-input-wrap"><label>Şifre</label><input id="rg_pass" type="password" placeholder="min 6 karakter"></div>
+    <div class="err-msg" id="rg_err"></div>
+    <button class="ml-btn" onclick="doRegister()">Kayıt Ol</button>
+    <div class="switch-link">Zaten üye misin? <span onclick="showLogin()">Giriş Yap</span></div>
+  </div>`;
+  document.body.appendChild(o);
+  o.querySelector("#rg_name").focus();
+}
+
+function doRegister(){
+  const name=document.getElementById("rg_name").value.trim();
+  const email=document.getElementById("rg_email").value.trim();
+  const username=document.getElementById("rg_user").value.trim();
+  const password=document.getElementById("rg_pass").value;
+  const err=document.getElementById("rg_err");
+  if(!name||!email||!username||!password){err.style.display="block";err.textContent="Tüm alanları doldurun!";return;}
+  if(username.length<3){err.style.display="block";err.textContent="Kullanıcı adı en az 3 karakter olmalı!";return;}
+  if(password.length<6){err.style.display="block";err.textContent="Şifre en az 6 karakter olmalı!";return;}
+  if(users.find(u=>u.username===username)){err.style.display="block";err.textContent="Bu kullanıcı adı zaten alınmış!";return;}
+  if(users.find(u=>u.email===email)){err.style.display="block";err.textContent="Bu e-posta ile zaten kayıt var!";return;}
+  const newUser={id:Date.now(),name,email,username,password,joinDate:new Date().toLocaleDateString("tr-TR"),isAdmin:false};
+  users.push(newUser);currentUser=newUser;saveAll();closeAllModals();renderTopbar();
+  toast(`Hoş geldiniz, ${name.split(" ")[0]}! Kayıt başarılı 🎉`);
+}
+
+// ===================== PROFILE =====================
+function openProfile(){
+  if(!currentUser)return;
+  closeAllModals();
+  let myReviews=[];
+  CARS.forEach(c=>{c.reviews.forEach(r=>{if(r.userId===currentUser.id)myReviews.push({car:c,review:r});});});
+  const myPending=pendingReviews.filter(r=>r.userId===currentUser.id);
+  const totalStars=myReviews.length?myReviews.reduce((s,x)=>s+x.review.stars,0):0;
+  const avgRating=myReviews.length?(totalStars/myReviews.length).toFixed(1):0;
+  const initials=currentUser.isAdmin?"A":currentUser.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  const o=document.createElement("div");
+  o.className="modal-overlay";
+  o.innerHTML=`<div class="modal-box" style="max-width:480px;max-height:80vh;overflow-y:auto">
+    <div class="modal-head"><h3>👤 Profilim</h3><button class="modal-close" onclick="closeAllModals()">✕</button></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div style="width:52px;height:52px;border-radius:50%;background:${currentUser.isAdmin?"var(--accent)":"var(--blue)"};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff">${initials}</div>
+      <div>
+        <div style="font-size:16px;font-weight:700">${currentUser.isAdmin?"Admin":""+currentUser.name}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${currentUser.isAdmin?"Sistem Yöneticisi":currentUser.email}</div>
+        ${!currentUser.isAdmin?`<div style="font-size:11px;color:var(--text3);margin-top:1px">Üyelik: ${currentUser.joinDate||"—"}</div>`:""}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div class="prof-stat"><div class="prof-stat-n">${myReviews.length}</div><div class="prof-stat-l">Onaylı Yorum</div></div>
+      <div class="prof-stat"><div class="prof-stat-n">${myPending.length}</div><div class="prof-stat-l">Bekleyen Yorum</div></div>
+      <div class="prof-stat"><div class="prof-stat-n">${avgRating>0?avgRating:"—"}</div><div class="prof-stat-l">Ort. Puan</div></div>
+    </div>
+    ${myReviews.length?`
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">ONAYLANMIŞ YORUMLARIM</div>
+    ${myReviews.map(({car,review})=>`
+      <div class="prof-rv" onclick="closeAllModals();selectCar(${car.id});" style="cursor:pointer">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="prof-rv-car">${BRAND_LOGO[car.brand]||"🚗"} ${car.model} <span style="font-size:10px;color:var(--text3)">${car.variant}</span></div>
+          <div>${starsHtml(review.stars,12)}</div>
+        </div>
+        <div class="prof-rv-text">${review.text}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">${review.date}</div>
+      </div>`).join("")}` : `<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">Henüz onaylı yorumun yok.</div>`}
+    ${myPending.length?`
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin:12px 0 8px">BEKLEYENLERİM</div>
+    ${myPending.map(r=>{const car=CARS.find(c=>c.id===r.carId);return`
+      <div class="prof-rv" style="border-color:rgba(245,158,11,0.2)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="prof-rv-car">${car?BRAND_LOGO[car.brand]+""+car.model:"Araç"} <span style="font-size:10px;background:rgba(245,158,11,0.12);color:#f59e0b;border-radius:3px;padding:1px 5px">Onay bekliyor</span></div>
+          <div>${starsHtml(r.stars,12)}</div>
+        </div>
+        <div class="prof-rv-text">${r.text}</div>
+      </div>`;}).join("")}`:""}
+    ${currentUser.isAdmin?`<div style="margin-top:14px"><button class="ml-btn" onclick="closeAllModals();openAdminPanel()">⚙️ Admin Paneline Git</button></div>`:""}
+  </div>`;
+  document.body.appendChild(o);
+}
+
+// ===================== SIDEBAR =====================
+function renderSidebar(){
+  const q=document.getElementById("searchInput").value.toLowerCase();
+  const sb=document.getElementById("sidebar");
+  let html=`<div class="sb-head">Markalar</div>`;
+  BRANDS.forEach(b=>{
+    const bCars=CARS.filter(c=>c.brand===b.id&&(!q||(c.model+c.variant).toLowerCase().includes(q)));
+    if(!bCars.length)return;
+    const isOpen=activeBrand===b.id;
+    html+=`<div class="brand-row ${isOpen?"open":""}" onclick="toggleBrand('${b.id}')">
+      <span class="bname">${b.name}</span>
+      <span class="bmeta"><span class="bcnt">${bCars.length}</span><span class="chev">▶</span></span>
+    </div>
+    <div class="model-list" id="ml_${b.id}">
+      ${bCars.map(c=>`<div class="model-row ${selectedCar&&selectedCar.id===c.id?"active":""}" onclick="selectCar(${c.id})" title="${c.model} ${c.variant}">${c.model} <span style="font-size:10px;color:var(--text3)">${c.variant.split(" ").slice(0,2).join(" ")}</span></div>`).join("")}
+    </div>`;
+  });
+  sb.innerHTML=html;
+}
+
+function toggleBrand(id){activeBrand=activeBrand===id?null:id;renderSidebar();}
+function handleSearch(){renderSidebar();}
+function showHome(){selectedCar=null;document.getElementById("heroBanner").style.display="";document.getElementById("carHeader").className="car-header";renderCenter();renderPhotoStrip();renderSpecs();}
+
+// ===================== SELECT CAR =====================
+function selectCar(id){
+  selectedCar=CARS.find(c=>c.id===id);
+  photoIdx=0;
+  document.getElementById("heroBanner").style.display="none";
+  renderCarHeader();
+  renderCenter();
+  renderPhotoStrip();
+  renderFilterChips();
+  renderSpecs();
+  renderSidebar();
+}
+
+// ===================== CAR HEADER =====================
+function renderCarHeader(){
+  const c=selectedCar;
+  const el=document.getElementById("carHeader");
+  if(!c){el.className="car-header";return;}
+  el.className="car-header visible";
+  const a=getAvg(c);
+  const inCmp=compareList.some(x=>x.id===c.id);
+  el.innerHTML=`<div class="car-h-top">
+    <div style="flex:1">
+      <div class="car-h-name">${BRAND_LOGO[c.brand]||"🚗"} ${c.model}</div>
+      <div class="car-h-sub">${c.variant} · ${c.year}</div>
+      <div class="car-h-meta">
+        <span class="badge fuel">${c.fuel}</span>
+        <span class="badge">${c.cat}</span>
+        <span class="badge price">${c.price}</span>
+        ${c.tags.map(t=>`<span class="badge">${t}</span>`).join("")}
+      </div>
+      <div class="rating-row">
+        ${starsHtml(a,12)}
+        <span class="avg-n">${a>0?a:"—"}</span>
+        <span class="rv-c">${c.reviews.length} yorum</span>
+        <button class="add-cmp ${inCmp?"added":""}" onclick="toggleCompare(${c.id})">${inCmp?"✓ Listede":"+ Karşılaştır"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===================== CENTER =====================
+function renderCenter(){
+  const el=document.getElementById("centerScroll");
+  const c=selectedCar;
+  if(!c){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🚗</div><div class="empty-title">Bir araç seçin</div><div class="empty-sub">Sol menüden markaya tıklayıp model seçin.</div></div>`;
+    return;
+  }
+  const rvHtml=c.reviews.length?c.reviews.map((r,ri)=>`
+    <div class="review-card">
+      <div class="rv-top">
+        <div class="av">${r.name.split(" ").map(w=>w[0]).join("").slice(0,2)}</div>
+        <div style="flex:1"><div class="rv-name">${r.name}</div><div class="rv-date">${r.date}</div></div>
+        <div class="rv-stars">${starsHtml(r.stars,12)}</div>
+        ${currentUser&&currentUser.isAdmin?`<button class="rv-del" onclick="adminDelRv(${c.id},${ri})">Sil</button>`:""}
+      </div>
+      <div class="rv-body">${r.text}</div>
+    </div>`).join(""):`<div style="color:var(--text3);font-size:12px;padding:8px 0 14px;text-align:center">Henüz onaylı yorum yok.</div>`;
+
+  let formHtml="";
+  if(currentUser&&!currentUser.isAdmin){
+    formHtml=`<div class="add-form">
+      <div class="form-grid">
+        <div class="fg"><label>Puan</label>
+          <select id="rvStars">
+            <option value="5">★★★★★ Mükemmel (5)</option>
+            <option value="4">★★★★☆ İyi (4)</option>
+            <option value="3">★★★☆☆ Orta (3)</option>
+            <option value="2">★★☆☆☆ Kötü (2)</option>
+            <option value="1">★☆☆☆☆ Çok kötü (1)</option>
+          </select>
+        </div>
+        <div class="fg"><label>Arabayı kaç yıldır kullanıyorsunuz?</label>
+          <select id="rvYears"><option value="">Seçin</option><option>1 yıldan az</option><option>1-3 yıl</option><option>3-5 yıl</option><option>5+ yıl</option></select>
+        </div>
+        <div class="fg"><label>Deneyiminiz</label><textarea id="rvText" placeholder="Yakıt tüketimi, konfor, bakım maliyeti, uzun yol performansı..."></textarea></div>
+      </div>
+      <button class="submit-btn" onclick="submitReview()">YORUMU GÖNDER</button>
+      <div style="font-size:10px;color:var(--text3);margin-top:5px;text-align:center">⏳ Yorumunuz yönetici onayından sonra yayınlanır.</div>
+    </div>`;
+  } else if(!currentUser){
+    formHtml=`<div class="login-required">
+      <div>Yorum yazabilmek için giriş yapmanız gerekiyor.</div>
+      <button onclick="showLogin()">Giriş Yap / Üye Ol</button>
+    </div>`;
+  }
+
+  el.innerHTML=`<div class="section-lbl">Kullanıcı Yorumları (${c.reviews.length})</div>
+    ${rvHtml}
+    <div class="section-lbl">Yorum Yaz</div>
+    ${formHtml}`;
+}
+
+function submitReview(){
+  const c=selectedCar;
+  if(!c||!currentUser)return;
+  const stars=parseInt(document.getElementById("rvStars").value||"5");
+  const text=(document.getElementById("rvText").value||"").trim();
+  if(!text){toast("Lütfen yorum yazın!");return;}
+  const months=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+  const now=new Date();
+  const entry={id:Date.now(),carId:c.id,userId:currentUser.id,name:currentUser.name,stars,text,date:`${months[now.getMonth()]} ${now.getFullYear()}`,status:"pending"};
+  pendingReviews.push(entry);
+  saveAll();
+  renderCenter();
+  toast("Yorumunuz gönderildi! Onay sonrası yayınlanacak. ✅");
+}
+
+function adminDelRv(carId,idx){
+  if(!confirm("Bu yorumu silmek istediğinizden emin misiniz?"))return;
+  const car=CARS.find(c=>c.id===carId);
+  if(car){car.reviews.splice(idx,1);renderCenter();renderCarHeader();toast("Yorum silindi.");}
+}
+
+// ===================== RIGHT PANEL =====================
+function renderPhotoStrip(){
+  const el=document.getElementById("photoStrip");
+  const c=selectedCar;
+  if(!c){el.innerHTML=`<div class="photo-placeholder"><div style="font-size:44px">🚘</div><span style="font-size:11px;color:var(--text3)">Araç seçilmedi</span></div>`;return;}
+  const photos=carPhotos[c.id]||[];
+  const total=photos.length||3;
+  if(photoIdx>=total)photoIdx=0;
+  let imgs="";
+  if(photos.length){
+    imgs=photos.map((p,i)=>`<img class="ph-img ${i===photoIdx?"active":""}" src="${p}" style="display:${i===photoIdx?"block":"none"}">`).join("");
+  } else {
+    imgs=[c.id*7,c.id*7+1,c.id*7+2].map((s,i)=>`<img class="ph-img ${i===photoIdx?"active":""}" src="https://picsum.photos/seed/car${s}/310/170" style="display:${i===photoIdx?"block":"none"}" onerror="this.style.display='none'">`).join("");
+  }
+  const dots=Array.from({length:total},(_,i)=>`<span class="dot ${i===photoIdx?"active":""}" onclick="goPhoto(${i})"></span>`).join("");
+  const delBtn=currentUser&&currentUser.isAdmin&&photos.length?`<button onclick="adminDelPhoto(${c.id},${photoIdx})" style="position:absolute;top:6px;right:6px;background:rgba(224,48,64,0.85);border:none;border-radius:4px;color:#fff;font-size:10px;padding:3px 7px;cursor:pointer;z-index:5">✕ Sil</button>`:"";
+  el.innerHTML=`${imgs}${delBtn}<button class="pnav l" onclick="prevPhoto()">‹</button><button class="pnav r" onclick="nextPhoto()">›</button><div class="photo-dots">${dots}</div>`;
+}
+function goPhoto(i){photoIdx=i;renderPhotoStrip();}
+function prevPhoto(){if(!selectedCar)return;const t=(carPhotos[selectedCar.id]||[]).length||3;photoIdx=(photoIdx-1+t)%t;renderPhotoStrip();}
+function nextPhoto(){if(!selectedCar)return;const t=(carPhotos[selectedCar.id]||[]).length||3;photoIdx=(photoIdx+1)%t;renderPhotoStrip();}
+function adminDelPhoto(carId,idx){if(!carPhotos[carId])return;carPhotos[carId].splice(idx,1);if(photoIdx>=carPhotos[carId].length)photoIdx=Math.max(0,carPhotos[carId].length-1);saveAll();renderPhotoStrip();toast("Fotoğraf silindi.");}
+
+function renderFilterChips(){
+  document.getElementById("filterChips").innerHTML=CATS.map(cat=>`<button class="fchip ${activeCat===cat?"on":""}" onclick="setFilter('${cat}')">${cat}</button>`).join("");
+}
+function setFilter(cat){activeCat=cat;renderFilterChips();}
+
+function renderSpecs(){
+  const el=document.getElementById("rightScroll");
+  const c=selectedCar;
+  if(!c){el.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);font-size:12px;text-align:center;padding:16px">Bir araç seçerek detayları görün</div>`;return;}
+  el.innerHTML=`<div class="specs-section">
+    <div class="spec-group-title">Temel Bilgiler</div>
+    <div class="spec-grid">
+      <div class="spec-box"><div class="spec-lbl">Yakıt</div><div class="spec-val">${c.fuel}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Kategori</div><div class="spec-val">${c.cat}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Yıl</div><div class="spec-val">${c.year}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Koltuk</div><div class="spec-val">${c.seats}</div></div>
+      <div class="spec-box wide"><div class="spec-lbl">Fiyat Aralığı</div><div class="spec-val" style="color:var(--accent2);font-size:11px">${c.price}</div></div>
+    </div>
+    <div class="spec-group-title">Motor & Performans</div>
+    <div class="spec-grid">
+      <div class="spec-box"><div class="spec-lbl">Güç</div><div class="spec-val">${c.power}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Tork</div><div class="spec-val">${c.torque}</div></div>
+      <div class="spec-box wide"><div class="spec-lbl">Motor</div><div class="spec-val" style="font-size:11px">${c.engine}</div></div>
+      <div class="spec-box wide"><div class="spec-lbl">Vites Kutusu</div><div class="spec-val" style="font-size:11px">${c.transmission}</div></div>
+      <div class="spec-box wide"><div class="spec-lbl">Çekiş</div><div class="spec-val">${c.drive}</div></div>
+    </div>
+    <div class="spec-group-title">Yakıt & Çevre</div>
+    <div class="spec-grid">
+      <div class="spec-box"><div class="spec-lbl">Tüketim</div><div class="spec-val">${c.consumption}</div></div>
+      <div class="spec-box"><div class="spec-lbl">CO₂</div><div class="spec-val">${c.co2}</div></div>
+    </div>
+    <div class="spec-group-title">Boyutlar & Hacim</div>
+    <div class="spec-grid">
+      <div class="spec-box"><div class="spec-lbl">Ağırlık</div><div class="spec-val">${c.weight}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Bagaj</div><div class="spec-val">${c.trunk}</div></div>
+      <div class="spec-box"><div class="spec-lbl">Dingil</div><div class="spec-val">${c.wb}</div></div>
+      <div class="spec-box wide"><div class="spec-lbl">Boyutlar (U×G×Y)</div><div class="spec-val" style="font-size:10px">${c.dims}</div></div>
+    </div>
+    <div class="spec-group-title">Değerlendirme Skorları</div>
+    ${Object.entries(SCORE_LABELS).map(([k,l])=>`<div class="score-row">
+      <div class="score-top"><span>${l}</span><span>${c.scores[k]}/100</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${c.scores[k]}%;background:${scoreColor(c.scores[k])}"></div></div>
+    </div>`).join("")}
+    <div class="spec-group-title">Artılar & Eksiler</div>
+    <div class="pc-grid">
+      <div class="pc-box pros"><div class="pc-title">Artılar</div>${c.pros.map(p=>`<div class="pc-item">${p}</div>`).join("")}</div>
+      <div class="pc-box cons"><div class="pc-title">Eksiler</div>${c.cons.map(p=>`<div class="pc-item">${p}</div>`).join("")}</div>
+    </div>
+  </div>`;
+}
+
+// ===================== COMPARE =====================
+function toggleCompare(id){
+  const car=CARS.find(c=>c.id===id);
+  const idx=compareList.findIndex(x=>x.id===id);
+  if(idx>=0){compareList.splice(idx,1);toast(`${car.model} karşılaştırmadan çıkarıldı.`);}
+  else{
+    if(compareList.length>=3){toast("En fazla 3 araç karşılaştırabilirsiniz.");return;}
+    compareList.push(car);toast(`${car.model} karşılaştırmaya eklendi! (${compareList.length}/3)`);
+  }
+  document.getElementById("cmpCnt").textContent=compareList.length;
+  if(selectedCar)renderCarHeader();
+}
+
+function openCompare(){
+  if(compareList.length<2){toast("En az 2 araç seçin.");return;}
+  closeAllModals();
+  const cols=compareList.length;
+  const FIELDS=[{l:"Fiyat",k:"price"},{l:"Yakıt",k:"fuel"},{l:"Güç",k:"power"},{l:"Tork",k:"torque"},{l:"Motor",k:"engine"},{l:"Vites",k:"transmission"},{l:"Çekiş",k:"drive"},{l:"Tüketim",k:"consumption"},{l:"CO₂",k:"co2"},{l:"Ağırlık",k:"weight"},{l:"Bagaj",k:"trunk"}];
+  const o=document.createElement("div");
+  o.className="modal-overlay top";
+  let html=`<div class="cmp-grid" style="grid-template-columns:repeat(${cols},1fr);margin-bottom:12px">
+    ${compareList.map(c=>`<div class="cmp-car-hd"><div class="clogo">${BRAND_LOGO[c.brand]||"🚗"}</div><h3>${c.model}</h3><p>${c.variant}</p><p class="cprice">${c.price}</p><p style="color:var(--gold);font-size:11px;margin-top:3px">${starsHtml(getAvg(c),11)} ${getAvg(c)>0?getAvg(c):"—"} (${c.reviews.length})</p></div>`).join("")}
+  </div>`;
+  FIELDS.forEach(f=>{
+    html+=`<div class="cmp-row" style="grid-template-columns:repeat(${cols},1fr)">${compareList.map(c=>`<div class="cmp-cell">${c[f.k]||"—"}</div>`).join("")}</div><div class="cmp-rl">${f.l}</div>`;
+  });
+  html+=`<div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin:14px 0 8px">DEĞERLENDİRME SKORLARI</div>`;
+  Object.entries(SCORE_LABELS).forEach(([k,l])=>{
+    const vals=compareList.map(c=>c.scores[k]);
+    const mx=Math.max(...vals);
+    html+=`<div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px">${l}</div>
+    <div class="cmp-row" style="grid-template-columns:repeat(${cols},1fr)">${compareList.map(c=>`<div class="cmp-cell ${c.scores[k]===mx&&vals.filter(v=>v===mx).length===1?"best":""}">${c.scores[k]}/100</div>`).join("")}</div></div>`;
+  });
+  o.innerHTML=`<div class="modal-box" style="max-width:820px;width:100%">
+    <div class="modal-head"><h3>⚡ Araç Karşılaştırma</h3><button class="modal-close" onclick="closeAllModals()">✕ Kapat</button></div>
+    ${html}
+  </div>`;
+  document.body.appendChild(o);
+}
+
+// ===================== HERO STATS =====================
+function renderHeroStats(){
+  const total=CARS.length;
+  const totalRvs=CARS.reduce((s,c)=>s+c.reviews.length,0);
+  const totalBrands=BRANDS.filter(b=>CARS.some(c=>c.brand===b.id)).length;
+  document.getElementById("heroStats").innerHTML=`
+    <div class="hero-stat"><div class="hero-stat-num">${totalBrands}</div><div class="hero-stat-lbl">Marka</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">${total}</div><div class="hero-stat-lbl">Model</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">${totalRvs}</div><div class="hero-stat-lbl">Kullanıcı Yorumu</div></div>`;
+}
+
+// ===================== ADMIN PANEL =====================
+function openAdminPanel(){
+  if(!currentUser||!currentUser.isAdmin){toast("Bu özellik sadece yöneticilere açıktır.");return;}
+  closeAllModals();
+  const pending=pendingReviews.filter(r=>r.status==="pending");
+  const o=document.createElement("div");
+  o.className="modal-overlay top";
+  const brandOpts=BRANDS.map(b=>`<option value="${b.id}">${b.name}</option>`).join("");
+  const catOpts=BRAND_CATS.map(c=>`<option value="${c}">${c}</option>`).join("");
+  const fuelOpts=FUELS.map(f=>`<option value="${f}">${f}</option>`).join("");
+  const pendHtml=pending.length?pending.map(r=>{
+    const car=CARS.find(c=>c.id===r.carId);
+    return`<div class="pending-card">
+      <div class="pnd-meta">
+        <strong style="color:var(--text)">${r.name}</strong> · ${r.date} · ${starsHtml(r.stars,11)}
+        <span style="margin-left:4px;font-size:10px;color:var(--text3)">${car?car.model+" "+car.variant:"Bilinmeyen araç"}</span>
+      </div>
+      <div class="pnd-text">${r.text}</div>
+      <div class="pnd-actions">
+        <button class="pnd-approve" onclick="approveReview(${r.id})">✓ Onayla</button>
+        <button class="pnd-reject" onclick="rejectReview(${r.id})">✕ Reddet</button>
+      </div>
+    </div>`;}).join(""):`<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px">Bekleyen yorum yok ✓</div>`;
+  const carListHtml=CARS.map(c=>`<div class="car-adm-row">
+    <span style="font-size:16px">${BRAND_LOGO[c.brand]||"🚗"}</span>
+    <div class="car-adm-info"><div class="car-adm-name">${c.model}</div><div class="car-adm-sub">${c.variant} · ${c.year}</div></div>
+    <label class="adm-btn blue" style="cursor:pointer;font-size:10px;padding:4px 7px">
+      📷<input type="file" accept="image/*" style="display:none" onchange="uploadPhoto(${c.id},this)">
+    </label>
+    <button class="adm-btn del" style="font-size:10px;padding:4px 7px" onclick="adminRemoveCar(${c.id})">Sil</button>
+  </div>`).join("");
+
+  // User list
+  const userListHtml=users.length?users.map(u=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px;background:var(--bg3);border-radius:6px;margin-bottom:4px;border:1px solid var(--border)">
+    <div>
+      <div style="font-size:12px;font-weight:600">${u.name}</div>
+      <div style="font-size:10px;color:var(--text3)">@${u.username} · ${u.email}</div>
+    </div>
+    <div style="font-size:10px;color:var(--text3)">${u.joinDate||"—"}</div>
+  </div>`).join(""):`<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">Kayıtlı kullanıcı yok.</div>`;
+
+  o.innerHTML=`<div class="modal-box" style="max-width:900px;width:100%;padding:0">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:16px;font-weight:700">⚙️ Yönetici Paneli</div><div style="font-size:11px;color:var(--text3)">arabayorumu.com</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="closeAllModals()" class="modal-close">✕ Kapat</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;min-height:400px;max-height:75vh;overflow-y:auto">
+      
+      <!-- COL 1: Pending Reviews -->
+      <div style="border-right:1px solid var(--border);padding:14px;overflow-y:auto">
+        <div class="adm-section-title">BEKLEYEN YORUMLAR <span class="adm-badge">${pending.length}</span></div>
+        <div id="pendingList">${pendHtml}</div>
+      </div>
+
+      <!-- COL 2: Cars -->
+      <div style="border-right:1px solid var(--border);padding:14px;overflow-y:auto">
+        <div class="adm-section-title">ARAÇ YÖNETİMİ</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:12px;margin-bottom:10px;border:1px solid var(--border)">
+          <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">+ Yeni Araç Ekle</div>
+          <div class="adm-grid">
+            <select id="nc_brand" class="adm-select">${brandOpts}</select>
+            <input id="nc_model" class="adm-input" placeholder="Model (ör: Corolla)">
+            <input id="nc_variant" class="adm-input" placeholder="Varyant (ör: 1.5 TSI 150bg)">
+            <input id="nc_year" class="adm-input" placeholder="Yıl (ör: 2022-2024)">
+            <select id="nc_fuel" class="adm-select">${fuelOpts}</select>
+            <select id="nc_cat" class="adm-select">${catOpts}</select>
+            <input id="nc_power" class="adm-input" placeholder="Güç (ör: 150 bg)">
+            <input id="nc_consumption" class="adm-input" placeholder="Tüketim (ör: 5.5 L/100km)">
+          </div>
+          <input id="nc_price" class="adm-input" placeholder="Fiyat (ör: 1.200.000–1.800.000 ₺)">
+          <button class="adm-btn" style="width:100%;margin-top:4px" onclick="adminAddCar()">ARACI EKLE</button>
+        </div>
+        <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Mevcut Araçlar (${CARS.length})</div>
+        <div style="max-height:280px;overflow-y:auto" id="adminCarList">${carListHtml}</div>
+      </div>
+
+      <!-- COL 3: Users -->
+      <div style="padding:14px;overflow-y:auto">
+        <div class="adm-section-title">KULLANICILAR <span class="adm-badge">${users.length}</span></div>
+        ${userListHtml}
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">SİTE İSTATİSTİKLERİ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div class="prof-stat"><div class="prof-stat-n">${CARS.length}</div><div class="prof-stat-lbl">Toplam Araç</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">${users.length}</div><div class="prof-stat-lbl">Toplam Üye</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">${CARS.reduce((s,c)=>s+c.reviews.length,0)}</div><div class="prof-stat-lbl">Onaylı Yorum</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">${pending.length}</div><div class="prof-stat-lbl">Bekleyen Yorum</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(o);
+}
+
+function approveReview(rid){
+  const idx=pendingReviews.findIndex(r=>r.id===rid);
+  if(idx<0)return;
+  const r=pendingReviews[idx];
+  const car=CARS.find(c=>c.id===r.carId);
+  if(car)car.reviews.unshift({name:r.name,userId:r.userId,date:r.date,stars:r.stars,text:r.text});
+  pendingReviews.splice(idx,1);
+  saveAll();
+  toast("Yorum onaylandı ve yayınlandı! ✓");
+  closeAllModals();openAdminPanel();
+  if(selectedCar&&selectedCar.id===r.carId){renderCenter();renderCarHeader();}
+}
+function rejectReview(rid){
+  const idx=pendingReviews.findIndex(r=>r.id===rid);
+  if(idx<0)return;
+  pendingReviews.splice(idx,1);saveAll();
+  toast("Yorum reddedildi.");closeAllModals();openAdminPanel();
+}
+
+function uploadPhoto(carId,input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    if(!carPhotos[carId])carPhotos[carId]=[];
+    carPhotos[carId].push(e.target.result);saveAll();
+    toast("Fotoğraf yüklendi! ✓");
+    if(selectedCar&&selectedCar.id===carId)renderPhotoStrip();
+    closeAllModals();openAdminPanel();
+  };
+  reader.readAsDataURL(file);
+}
+
+function adminRemoveCar(id){
+  if(!confirm("Bu aracı silmek istediğinizden emin misiniz?"))return;
+  const idx=CARS.findIndex(c=>c.id===id);
+  if(idx>=0){
+    const ci=customCars.findIndex(c=>c.id===id);
+    if(ci>=0)customCars.splice(ci,1);else deletedIds.push(id);
+    CARS.splice(idx,1);saveAll();
+    if(selectedCar&&selectedCar.id===id){selectedCar=null;document.getElementById("heroBanner").style.display="";document.getElementById("carHeader").className="car-header";renderCenter();renderPhotoStrip();renderSpecs();}
+    renderSidebar();renderHeroStats();
+    toast("Araç silindi.");closeAllModals();openAdminPanel();
+  }
+}
+
+function adminAddCar(){
+  const brand=document.getElementById("nc_brand").value;
+  const model=document.getElementById("nc_model").value.trim();
+  const variant=document.getElementById("nc_variant").value.trim();
+  const year=document.getElementById("nc_year").value.trim();
+  const fuel=document.getElementById("nc_fuel").value;
+  const cat=document.getElementById("nc_cat").value;
+  const power=document.getElementById("nc_power").value.trim();
+  const consumption=document.getElementById("nc_consumption").value.trim();
+  const price=document.getElementById("nc_price").value.trim();
+  if(!model||!variant||!year){toast("Model, varyant ve yıl zorunludur!");return;}
+  const newCar={id:Date.now(),brand,model,variant,year,fuel,power:power||"—",torque:"—",engine:"—",transmission:"—",consumption:consumption||"—",co2:"—",weight:"—",dims:"—",wb:"—",trunk:"—",seats:5,drive:"—",price:price||"—",cat,tags:[],pros:[],cons:[],scores:{guvenilirlik:70,konfor:70,surusKeyfi:70,ekonomi:70,teknoloji:70},reviews:[]};
+  CARS.push(newCar);customCars.push(newCar);saveAll();renderSidebar();renderHeroStats();
+  toast(`${model} eklendi! ✓`);closeAllModals();openAdminPanel();
+}
+
+// ===================== INIT =====================
+renderSidebar();
+renderFilterChips();
+renderHeroStats();
+renderTopbar();
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done: $(wc -c < /mnt/user-data/outputs/arabayorumu.html) bytes"
